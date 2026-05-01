@@ -99,7 +99,26 @@ function generateColor(seed) {
   var hue = Math.abs(hash) % 360;
   return "hsl(" + hue + ", 70%, 55%)";
 }
+  
+fetch("https://memeriau.github.io/cartescolaire/colleges.json")
+  .then(function(res){
+    if (!res.ok) throw new Error("college.json not found");
+    return res.json();
+  })
+  .then(function(data){
+    data.forEach(function(c){
+      var key = String(c.UAI || "").trim();
+      if (key) {
+        collegeLookup[key] = c.Nom || "";
+      }
+    });
 
+    console.log("College lookup loaded:", Object.keys(collegeLookup).length);
+  })
+  .catch(function(err){
+    console.error("Error loading college.json:", err);
+  });
+  
 select.addEventListener("change", function() {
   var dept = this.value;
   if (!dept) return;
@@ -141,7 +160,12 @@ select.addEventListener("change", function() {
 
         onEachFeature: function(feature, layer) {
           var uai = getUAI(feature);
-          layer.bindPopup("UAI: " + (uai || "missing"));
+          var name = collegeLookup[uai] || "Nom inconnu";
+
+layer.bindPopup(
+  "UAI: " + (uai || "missing") + "<br>" +
+  "Nom: " + name
+);
         }
       }).addTo(map);
 
@@ -186,11 +210,19 @@ select.addEventListener("change", function() {
         },
 
         onEachFeature: function(feature, layer) {
-          layer.bindPopup(
-            "Overlap between:<br>" +
-            "UAI 1: " + feature.properties.UAI_1 + "<br>" +
-            "UAI 2: " + feature.properties.UAI_2
-          );
+         var u1 = feature.properties.UAI_1;
+var u2 = feature.properties.UAI_2;
+
+var n1 = collegeLookup[u1] || "Nom inconnu";
+var n2 = collegeLookup[u2] || "Nom inconnu";
+
+layer.bindPopup(
+  "Overlap between:<br>" +
+  "UAI 1: " + u1 + "<br>" +
+  "Nom 1: " + n1 + "<br><br>" +
+  "UAI 2: " + u2 + "<br>" +
+  "Nom 2: " + n2
+);
         }
       }).addTo(map);
 
