@@ -80,15 +80,24 @@ document.addEventListener("DOMContentLoaded", function () {
     return uaiColors[uai];
   }
 
-  function getUAI(feature) {
-    var p = feature.properties || {};
-    return p.code_rne || p.UAI || p.uai || p.code_st || "";
-  }
+ function getUAI(feature) {
+  var p = feature.properties || {};
+  return cleanKey(p.code_rne || p.UAI || p.uai || p.code_st || "");
+}
 
  var currentOverlapLayer = null;
 var collegeLookup = {};
+  var collegeLookupReady = false;
  var assignedColors = {};
 var usedColors = {};
+
+  function cleanKey(x) {
+  return String(x || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "");
+}
+
 
 function generateColor(seed) {
   var hash = 0;
@@ -100,22 +109,22 @@ function generateColor(seed) {
   return "hsl(" + hue + ", 70%, 55%)";
 }
   
-fetch("https://memeriau.github.io/cartescolaire/colleges.json")
+fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/colleges.json")
   .then(function(res){
     if (!res.ok) throw new Error("colleges.json not found");
     return res.json();
   })
   .then(function(data){
     data.forEach(function(c){
-      var key = String(c.UAI || c.uai || c.code_rne || "").trim();
-      var nom = c.Nom || c.nom || c.nom_etab || "";
-
+      var key = cleanKey(c.UAI);
       if (key) {
-        collegeLookup[key] = nom;
+        collegeLookup[key] = c.Nom || "";
       }
     });
 
+    collegeLookupReady = true;
     console.log("College lookup loaded:", Object.keys(collegeLookup).length);
+    console.log("Test 0930043S:", collegeLookup["0930043S"]);
   })
   .catch(function(err){
     console.error("Error loading colleges.json:", err);
@@ -147,6 +156,8 @@ select.addEventListener("change", function() {
       currentLayer = L.geoJSON(data, {
         style: function(feature) {
   var uai = getUAI(feature);
+          var name = collegeLookup[uai] || "Nom inconnu";
+
 
   if (!assignedColors[uai]) {
     assignedColors[uai] = generateColor(uai);
@@ -162,6 +173,7 @@ select.addEventListener("change", function() {
 
         onEachFeature: function(feature, layer) {
           var uai = getUAI(feature);
+          
           var name = collegeLookup[uai] || "Nom inconnu";
 
 layer.bindPopup(
