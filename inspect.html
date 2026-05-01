@@ -397,7 +397,7 @@ if (showCollegeForPoint) {
               color: "red",
               weight: 2,
               fillColor: "red",
-              fillOpacity: 0.1
+              fillOpacity: 0.2
             };
           },
 
@@ -417,6 +417,8 @@ if (showCollegeForPoint) {
             );
           }
         }).addTo(map);
+
+        currentOverlapLayer.bringToFront();
 
       if (currentMarker) {
   var group = L.featureGroup([currentLayer, currentMarker]);
