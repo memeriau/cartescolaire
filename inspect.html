@@ -420,12 +420,7 @@ if (showCollegeForPoint) {
 
         currentOverlapLayer.bringToFront();
 
-      if (currentMarker) {
-  var group = L.featureGroup([currentLayer, currentMarker]);
-  map.fitBounds(group.getBounds(), { padding: [40, 40] });
-} else {
-  map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
-}
+      map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
 
       })
       .catch(function(err) {
