@@ -107,9 +107,11 @@ fetch("https://memeriau.github.io/cartescolaire/colleges.json")
   })
   .then(function(data){
     data.forEach(function(c){
-      var key = String(c.UAI || "").trim();
+      var key = String(c.UAI || c.uai || c.code_rne || "").trim();
+      var nom = c.Nom || c.nom || c.nom_etab || "";
+
       if (key) {
-        collegeLookup[key] = c.Nom || "";
+        collegeLookup[key] = nom;
       }
     });
 
