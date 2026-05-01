@@ -465,7 +465,7 @@ if (showCollegeForPoint) {
 
 
   function loadSelectedColleges() {
-  fetch("selection.csv")
+  fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv")
     .then(function(res) {
       if (!res.ok) throw new Error("selection.csv not found");
       return res.text();
