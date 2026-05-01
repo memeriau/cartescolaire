@@ -23,7 +23,7 @@
       z-index: 1000;
       top: 10px;
       left: 10px;
-      width: 380px;
+      width: 420px;
       background: white;
       padding: 10px;
       border-radius: 6px;
@@ -40,7 +40,7 @@
 
     #suggestions {
       margin-top: 6px;
-      max-height: 220px;
+      max-height: 240px;
       overflow-y: auto;
       border: 1px solid #ddd;
       display: none;
@@ -62,7 +62,7 @@
 <body>
 
 <div id="searchBox">
-  <input id="addressInput" type="text" placeholder="Saisir une adresse..." />
+  <input id="addressInput" type="text" placeholder="Adresse, commune ou département..." />
   <div id="suggestions"></div>
 </div>
 
@@ -116,6 +116,26 @@ document.addEventListener("DOMContentLoaded", function () {
     return "hsl(" + hue + ", 70%, 55%)";
   }
 
+  function normalizeDepartmentQuery(query) {
+    query = String(query || "").trim().toUpperCase();
+
+    if (/^0[1-9]$/.test(query)) {
+      return query.substring(1);
+    }
+
+    return query;
+  }
+
+  function isDepartmentQuery(query) {
+    query = String(query || "").trim().toUpperCase();
+
+    return (
+      /^[0-9]{1,3}$/.test(query) ||
+      query === "2A" ||
+      query === "2B"
+    );
+  }
+
   function getDepartementFromAddressProperties(p) {
     var postcode = String(p.postcode || "").trim();
     var citycode = String(p.citycode || "").trim();
@@ -128,14 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (postcode.length >= 2) {
-      var dept = postcode.substring(0, 2);
-
-      // Your files are named cartescolaire_2.geojson, not cartescolaire_02.geojson
-      if (/^0[1-9]$/.test(dept)) {
-        dept = dept.substring(1);
-      }
-
-      return dept;
+      return normalizeDepartmentQuery(postcode.substring(0, 2));
     }
 
     return "";
@@ -178,22 +191,42 @@ document.addEventListener("DOMContentLoaded", function () {
     debounceTimer = setTimeout(function() {
       query = String(query || "").trim();
 
-      if (query.length < 3) {
+      if (query.length < 2) {
         hideSuggestions();
+        return;
+      }
+
+      if (isDepartmentQuery(query)) {
+        var dept = normalizeDepartmentQuery(query);
+
+        suggestions = [{
+          properties: {
+            label: "Charger le département " + dept,
+            type: "department",
+            dept: dept
+          },
+          geometry: null
+        }];
+
+        showSuggestions(suggestions);
         return;
       }
 
       fetch(
         "https://data.geopf.fr/geocodage/search/?q=" +
         encodeURIComponent(query) +
-        "&limit=20&autocomplete=1&type=housenumber"
+        "&limit=20&autocomplete=1"
       )
         .then(function(res) {
           return res.json();
         })
         .then(function(data) {
           suggestions = (data.features || []).filter(function(f) {
-            return f.properties && f.properties.type === "housenumber";
+            return f.properties && (
+              f.properties.type === "housenumber" ||
+              f.properties.type === "street" ||
+              f.properties.type === "municipality"
+            );
           });
 
           showSuggestions(suggestions);
@@ -228,6 +261,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   function loadDepartment(dept, addressFeature) {
+    dept = normalizeDepartmentQuery(dept);
+
     var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/cartescolaire_" + dept + ".geojson";
 
     console.log("Loading:", file);
@@ -270,54 +305,59 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }).addTo(map);
 
-        var coords = addressFeature.geometry.coordinates;
-        var lng = coords[0];
-        var lat = coords[1];
+        var hasPoint =
+          addressFeature &&
+          addressFeature.geometry &&
+          addressFeature.geometry.coordinates &&
+          addressFeature.geometry.coordinates.length >= 2;
 
-        currentMarker = L.marker([lat, lng]).addTo(map);
+        if (hasPoint) {
+          var coords = addressFeature.geometry.coordinates;
+          var lng = coords[0];
+          var lat = coords[1];
 
-        var point = turf.point([lng, lat]);
-var collegesAtAddress = [];
+          currentMarker = L.marker([lat, lng]).addTo(map);
 
-(data.features || []).forEach(function(poly) {
-  try {
-    if (
-      turf.booleanPointInPolygon(point, poly, { ignoreBoundary: false }) ||
-      turf.booleanIntersects(point, poly)
-    ) {
-      var uai = getUAI(poly);
-      var nom = collegeLookup[uai] || "Nom inconnu";
+          var point = turf.point([lng, lat]);
+          var collegesAtAddress = [];
 
-      collegesAtAddress.push({
-        uai: uai,
-        nom: nom
-      });
-    }
-  } catch (e) {
-    console.warn("Erreur point-in-polygon:", e);
-  }
-});
+          (data.features || []).forEach(function(poly) {
+            try {
+              if (
+                turf.booleanPointInPolygon(point, poly, { ignoreBoundary: false }) ||
+                turf.booleanIntersects(point, poly)
+              ) {
+                var uai = getUAI(poly);
+                var nom = collegeLookup[uai] || "Nom inconnu";
 
-var popupHtml = "<b>Adresse sélectionnée</b><br>" +
-  (addressFeature.properties.label || "") + "<br><br>";
+                collegesAtAddress.push({
+                  uai: uai,
+                  nom: nom
+                });
+              }
+            } catch (e) {
+              console.warn("Erreur point-in-polygon:", e);
+            }
+          });
 
-if (collegesAtAddress.length > 0) {
-  popupHtml += "<b>Collège(s) associé(s)</b><br>";
+          var popupHtml = "<b>Adresse sélectionnée</b><br>" +
+            (addressFeature.properties.label || "") + "<br><br>";
 
-  collegesAtAddress.forEach(function(c) {
-    popupHtml +=
-      "UAI: " + (c.uai || "missing") + "<br>" +
-      "Nom: " + c.nom + "<br><br>";
-  });
-} else {
-  popupHtml += "<b>Aucun collège trouvé</b>";
-}
+          if (collegesAtAddress.length > 0) {
+            popupHtml += "<b>Collège(s) associé(s)</b><br>";
 
-currentMarker.bindPopup(popupHtml).openPopup();
+            collegesAtAddress.forEach(function(c) {
+              popupHtml +=
+                "UAI: " + (c.uai || "missing") + "<br>" +
+                "Nom: " + c.nom + "<br><br>";
+            });
+          } else {
+            popupHtml += "<b>Aucun collège trouvé</b>";
+          }
 
-        map.fitBounds(currentLayer.getBounds());
+          currentMarker.bindPopup(popupHtml).openPopup();
+        }
 
-        // Detect overlaps inside selected department
         var overlaps = [];
         var features = data.features || [];
 
@@ -372,9 +412,12 @@ currentMarker.bindPopup(popupHtml).openPopup();
           }
         }).addTo(map);
 
-        // Zoom to marker + department layer
-        var group = L.featureGroup([currentLayer, currentMarker]);
-        map.fitBounds(group.getBounds(), { padding: [40, 40] });
+        if (currentMarker) {
+          var group = L.featureGroup([currentLayer, currentMarker]);
+          map.fitBounds(group.getBounds(), { padding: [40, 40] });
+        } else {
+          map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
+        }
       })
       .catch(function(err) {
         alert(err.message);
@@ -387,17 +430,25 @@ currentMarker.bindPopup(popupHtml).openPopup();
     if (!feature) return;
 
     var p = feature.properties || {};
+
+    if (p.type === "department") {
+      input.value = p.label || "";
+      hideSuggestions();
+      loadDepartment(p.dept, null);
+      return;
+    }
+
     var dept = getDepartementFromAddressProperties(p);
 
     if (!dept) {
-      alert("Impossible de déterminer le département pour cette adresse.");
+      alert("Impossible de déterminer le département pour cette sélection.");
       return;
     }
 
     input.value = p.label || "";
     hideSuggestions();
 
-    console.log("Adresse sélectionnée:", p.label);
+    console.log("Sélection:", p.label);
     console.log("Département:", dept);
 
     loadDepartment(dept, feature);
