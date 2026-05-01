@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
  var currentOverlapLayer = null;
-
+var collegeLookup = {};
  var assignedColors = {};
 var usedColors = {};
 
@@ -102,7 +102,7 @@ function generateColor(seed) {
   
 fetch("https://memeriau.github.io/cartescolaire/colleges.json")
   .then(function(res){
-    if (!res.ok) throw new Error("college.json not found");
+    if (!res.ok) throw new Error("colleges.json not found");
     return res.json();
   })
   .then(function(data){
@@ -116,7 +116,7 @@ fetch("https://memeriau.github.io/cartescolaire/colleges.json")
     console.log("College lookup loaded:", Object.keys(collegeLookup).length);
   })
   .catch(function(err){
-    console.error("Error loading college.json:", err);
+    console.error("Error loading colleges.json:", err);
   });
   
 select.addEventListener("change", function() {
