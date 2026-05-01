@@ -306,20 +306,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }).addTo(map);
 
         var hasPoint =
-          addressFeature &&
-          addressFeature.geometry &&
-          addressFeature.geometry.coordinates &&
-          addressFeature.geometry.coordinates.length >= 2;
+  addressFeature &&
+  addressFeature.geometry &&
+  addressFeature.geometry.coordinates &&
+  addressFeature.geometry.coordinates.length >= 2;
 
-        if (hasPoint) {
-          var coords = addressFeature.geometry.coordinates;
-          var lng = coords[0];
-          var lat = coords[1];
+var selectionType = addressFeature && addressFeature.properties
+  ? addressFeature.properties.type
+  : "";
 
-          currentMarker = L.marker([lat, lng]).addTo(map);
+var showCollegeForPoint = hasPoint && selectionType === "housenumber";
 
-          var point = turf.point([lng, lat]);
-          var collegesAtAddress = [];
+if (showCollegeForPoint) {
+  var coords = addressFeature.geometry.coordinates;
+  var lng = coords[0];
+  var lat = coords[1];
+
+  currentMarker = L.marker([lat, lng]).addTo(map);
+
+  var point = turf.point([lng, lat]);
+  var collegesAtAddress = [];
 
           (data.features || []).forEach(function(poly) {
             try {
@@ -412,13 +418,12 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }).addTo(map);
 
-        if (currentMarker) {
-          var group = L.featureGroup([currentLayer, currentMarker]);
-          map.fitBounds(group.getBounds(), { padding: [40, 40] });
-        } else {
-          map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
-        }
-      })
+       if (currentMarker) {
+  var group = L.featureGroup([currentLayer, currentMarker]);
+  map.fitBounds(group.getBounds(), { padding: [40, 40] });
+} else {
+  map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
+}
       .catch(function(err) {
         alert(err.message);
         console.error(err);
