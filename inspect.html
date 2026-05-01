@@ -91,6 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var collegeLookup = {};
   var debounceTimer = null;
   var suggestions = [];
+  var selectedUAISet = new Set();
+  var selectedLayers = [];
 
   function cleanKey(x) {
     return String(x || "")
@@ -185,6 +187,37 @@ document.addEventListener("DOMContentLoaded", function () {
     suggestionsBox.style.display = "block";
   }
 
+  function deptFromUAI(uai) {
+  uai = cleanKey(uai);
+
+  // Example: 0930043S -> 93
+  if (/^0[1-9]/.test(uai)) {
+    return String(parseInt(uai.substring(0, 3), 10));
+  }
+
+  // Example: 0711897B -> 71
+  if (/^[0-9]{3}/.test(uai)) {
+    return String(parseInt(uai.substring(0, 3), 10));
+  }
+
+  return "";
+}
+
+function parseSelectionCSV(text) {
+  var lines = text.trim().split(/\r?\n/);
+
+  // Remove header
+  lines.shift();
+
+  return lines
+    .map(function(line) {
+      return cleanKey(line.split(",")[0]);
+    })
+    .filter(function(uai) {
+      return uai.length > 0;
+    });
+}
+
   function fetchBAN(query) {
     clearTimeout(debounceTimer);
 
@@ -255,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       console.log("College lookup loaded:", Object.keys(collegeLookup).length);
+      loadSelectedColleges();
     })
     .catch(function(err){
       console.error("Error loading colleges.json:", err);
@@ -429,6 +463,85 @@ if (showCollegeForPoint) {
       });
   }
 
+
+  function loadSelectedColleges() {
+  fetch("selection.csv")
+    .then(function(res) {
+      if (!res.ok) throw new Error("selection.csv not found");
+      return res.text();
+    })
+    .then(function(csvText) {
+      var selectedUAIs = parseSelectionCSV(csvText);
+
+      selectedUAIs.forEach(function(uai) {
+        selectedUAISet.add(uai);
+      });
+
+      console.log("Selected colleges:", selectedUAIs.length);
+
+      var departments = {};
+
+      selectedUAIs.forEach(function(uai) {
+        var dept = deptFromUAI(uai);
+        if (dept) departments[dept] = true;
+      });
+
+      Object.keys(departments).forEach(function(dept) {
+        var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/cartescolaire_" + dept + ".geojson";
+
+        fetch(file)
+          .then(function(res) {
+            if (!res.ok) throw new Error("File not found: " + file);
+            return res.json();
+          })
+          .then(function(data) {
+            var selectedFeatures = (data.features || []).filter(function(feature) {
+              return selectedUAISet.has(getUAI(feature));
+            });
+
+            if (!selectedFeatures.length) return;
+
+            var layer = L.geoJSON(selectedFeatures, {
+              style: function(feature) {
+                var uai = getUAI(feature);
+
+                if (!assignedColors[uai]) {
+                  assignedColors[uai] = generateColor(uai);
+                }
+
+                return {
+                  color: "black",
+                  weight: 1,
+                  fillColor: assignedColors[uai],
+                  fillOpacity: 0.45
+                };
+              },
+
+              onEachFeature: function(feature, layer) {
+                var uai = getUAI(feature);
+                var name = collegeLookup[uai] || "Nom inconnu";
+
+                layer.bindPopup(
+                  "UAI: " + uai + "<br>" +
+                  "Nom: " + name
+                );
+              }
+            }).addTo(map);
+
+            selectedLayers.push(layer);
+
+            var group = L.featureGroup(selectedLayers);
+            map.fitBounds(group.getBounds(), { padding: [40, 40] });
+          })
+          .catch(function(err) {
+            console.error(err);
+          });
+      });
+    })
+    .catch(function(err) {
+      console.error("Error loading selection.csv:", err);
+    });
+}
   function selectAddress(index) {
     var feature = suggestions[index];
     if (!feature) return;
