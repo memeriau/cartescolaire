@@ -276,11 +276,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
         currentMarker = L.marker([lat, lng]).addTo(map);
 
-        currentMarker.bindPopup(
-          "<b>Adresse sélectionnée</b><br>" +
-          (addressFeature.properties.label || "") + "<br>" +
-          "Département: " + dept
-        ).openPopup();
+        var point = turf.point([lng, lat]);
+var collegesAtAddress = [];
+
+(data.features || []).forEach(function(poly) {
+  try {
+    if (
+      turf.booleanPointInPolygon(point, poly, { ignoreBoundary: false }) ||
+      turf.booleanIntersects(point, poly)
+    ) {
+      var uai = getUAI(poly);
+      var nom = collegeLookup[uai] || "Nom inconnu";
+
+      collegesAtAddress.push({
+        uai: uai,
+        nom: nom
+      });
+    }
+  } catch (e) {
+    console.warn("Erreur point-in-polygon:", e);
+  }
+});
+
+var popupHtml = "<b>Adresse sélectionnée</b><br>" +
+  (addressFeature.properties.label || "") + "<br><br>";
+
+if (collegesAtAddress.length > 0) {
+  popupHtml += "<b>Collège(s) associé(s)</b><br>";
+
+  collegesAtAddress.forEach(function(c) {
+    popupHtml +=
+      "UAI: " + (c.uai || "missing") + "<br>" +
+      "Nom: " + c.nom + "<br><br>";
+  });
+} else {
+  popupHtml += "<b>Aucun collège trouvé</b>";
+}
+
+currentMarker.bindPopup(popupHtml).openPopup();
 
         map.fitBounds(currentLayer.getBounds());
 
