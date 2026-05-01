@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 250);
   }
 
-  fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/colleges.json")
+  fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges.json")
     .then(function(res){
       if (!res.ok) throw new Error("colleges.json not found");
       return res.json();
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function loadDepartment(dept, addressFeature) {
     dept = normalizeDepartmentQuery(dept);
 
-    var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/cartescolaire_" + dept + ".geojson";
+    var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/cartescolaire_" + dept + ".geojson";
 
     console.log("Loading:", file);
 
