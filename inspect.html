@@ -418,12 +418,14 @@ if (showCollegeForPoint) {
           }
         }).addTo(map);
 
-       if (currentMarker) {
+      if (currentMarker) {
   var group = L.featureGroup([currentLayer, currentMarker]);
   map.fitBounds(group.getBounds(), { padding: [40, 40] });
 } else {
   map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
 }
+
+      })
       .catch(function(err) {
         alert(err.message);
         console.error(err);
