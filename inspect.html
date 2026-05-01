@@ -467,22 +467,24 @@ if (showCollegeForPoint) {
   function loadSelectedColleges() {
   fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv")
     .then(function(res) {
-      if (!res.ok) throw new Error("selection.csv not found");
+      if (!res.ok) throw new Error("selection.csv not found: " + res.status);
       return res.text();
     })
     .then(function(csvText) {
+      console.log("selection.csv content preview:", csvText.slice(0, 200));
+
       var selectedUAIs = parseSelectionCSV(csvText);
+      console.log("Selected UAIs:", selectedUAIs);
 
       selectedUAIs.forEach(function(uai) {
         selectedUAISet.add(uai);
       });
 
-      console.log("Selected colleges:", selectedUAIs.length);
-
       var departments = {};
 
       selectedUAIs.forEach(function(uai) {
         var dept = deptFromUAI(uai);
+        console.log("UAI:", uai, "dept:", dept);
         if (dept) departments[dept] = true;
       });
 
@@ -499,6 +501,8 @@ if (showCollegeForPoint) {
               return selectedUAISet.has(getUAI(feature));
             });
 
+            console.log("Dept", dept, "matched polygons:", selectedFeatures.length);
+
             if (!selectedFeatures.length) return;
 
             var layer = L.geoJSON(selectedFeatures, {
@@ -511,9 +515,9 @@ if (showCollegeForPoint) {
 
                 return {
                   color: "black",
-                  weight: 1,
+                  weight: 2,
                   fillColor: assignedColors[uai],
-                  fillOpacity: 0.45
+                  fillOpacity: 0.55
                 };
               },
 
@@ -540,6 +544,7 @@ if (showCollegeForPoint) {
     })
     .catch(function(err) {
       console.error("Error loading selection.csv:", err);
+      alert(err.message);
     });
 }
   function selectAddress(index) {
