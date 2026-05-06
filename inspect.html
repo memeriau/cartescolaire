@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GeoJSON Viewer</title>
+  <title>Carte Scolaire</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
-    #map {
-      height: 100%;
-      width: 100%;
-    }
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
 
     #searchBox {
       position: absolute;
@@ -53,541 +44,293 @@
       border-bottom: 1px solid #eee;
     }
 
-    .suggestion:hover {
-      background: #f0f0f0;
+    .suggestion:hover { background: #f0f0f0; }
+
+    .maplibregl-popup-content {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      max-width: 260px;
     }
   </style>
 </head>
-
 <body>
 
 <div id="searchBox">
   <input id="addressInput" type="text" placeholder="Adresse, commune ou département..." />
   <div id="suggestions"></div>
 </div>
-
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3/dist/pmtiles.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
+  'use strict';
 
-  var map = L.map("map").setView([46.7, 2.5], 6);
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol('pmtiles', protocol.tile.bind(protocol));
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+  const PMTILES      = 'pmtiles://https://raw.githubusercontent.com/memeriau/cartescolaire/main/cartescolaire.pmtiles';
+  const SOURCE_LAYER = 'zones';
 
-  var input = document.getElementById("addressInput");
-  var suggestionsBox = document.getElementById("suggestions");
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+      version: 8,
+      sources: {
+        osm: {
+          type: 'raster',
+          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          attribution: '&copy; OpenStreetMap contributors'
+        },
+        cs: { type: 'vector', url: PMTILES }
+      },
+      layers: [
+        { id: 'osm', type: 'raster', source: 'osm' },
 
-  var currentLayer = null;
-  var currentOverlapLayer = null;
-  var currentMarker = null;
+        // All zones – colour driven by pre-computed hue stored in the tile
+        {
+          id: 'zones-fill',
+          type: 'fill',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          paint: {
+            'fill-color': ['hsl', ['get', 'hue'], 70, 55],
+            'fill-opacity': 0.25
+          }
+        },
 
-  var assignedColors = {};
-  var collegeLookup = {};
-  var debounceTimer = null;
-  var suggestions = [];
-  var selectedUAISet = new Set();
-  var selectedLayers = [];
+        // Selected colleges (from selection.csv) – higher opacity
+        {
+          id: 'zones-selected',
+          type: 'fill',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
+          paint: {
+            'fill-color': ['hsl', ['get', 'hue'], 70, 55],
+            'fill-opacity': 0.55
+          }
+        },
 
-  function cleanKey(x) {
-    return String(x || "")
-      .trim()
-      .toUpperCase()
-      .replace(/\s+/g, "");
+        // Multi-secteur zones – blue tint
+        {
+          id: 'zones-multisecteur',
+          type: 'fill',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          filter: ['==', ['get', 'multisecteur'], 1],
+          paint: { 'fill-color': '#0000ff', 'fill-opacity': 0.12 }
+        },
+
+        {
+          id: 'zones-outline',
+          type: 'line',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          paint: { 'line-color': '#000000', 'line-width': 0.5 }
+        }
+      ]
+    },
+    center: [2.5, 46.7],
+    zoom: 5
+  });
+
+  // ── Search UI ──────────────────────────────────────────────────────────────
+
+  const input          = document.getElementById('addressInput');
+  const suggestionsBox = document.getElementById('suggestions');
+  let suggestions    = [];
+  let debounceTimer  = null;
+  let currentMarker  = null;
+
+  function normalizeDept(q) {
+    q = String(q || '').trim().toUpperCase();
+    return /^0[1-9]$/.test(q) ? q.substring(1) : q;
   }
 
-  function getUAI(feature) {
-    var p = feature.properties || {};
-    return cleanKey(p.code_rne || p.UAI || p.uai || p.code_st || "");
+  function isDeptQuery(q) {
+    q = String(q || '').trim().toUpperCase();
+    return /^[0-9]{1,3}$/.test(q) || q === '2A' || q === '2B';
   }
 
-  function generateColor(seed) {
-    seed = cleanKey(seed);
-
-    var hash = 0;
-    for (var i = 0; i < seed.length; i++) {
-      hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    var hue = Math.abs(hash) % 360;
-    return "hsl(" + hue + ", 70%, 55%)";
-  }
-
-  function normalizeDepartmentQuery(query) {
-    query = String(query || "").trim().toUpperCase();
-
-    if (/^0[1-9]$/.test(query)) {
-      return query.substring(1);
-    }
-
-    return query;
-  }
-
-  function isDepartmentQuery(query) {
-    query = String(query || "").trim().toUpperCase();
-
-    return (
-      /^[0-9]{1,3}$/.test(query) ||
-      query === "2A" ||
-      query === "2B"
-    );
-  }
-
-  function getDepartementFromAddressProperties(p) {
-    var postcode = String(p.postcode || "").trim();
-    var citycode = String(p.citycode || "").trim();
-
-    if (citycode.indexOf("2A") === 0) return "2A";
-    if (citycode.indexOf("2B") === 0) return "2B";
-
-    if (postcode.indexOf("97") === 0 || postcode.indexOf("98") === 0) {
-      return postcode.substring(0, 3);
-    }
-
-    if (postcode.length >= 2) {
-      return normalizeDepartmentQuery(postcode.substring(0, 2));
-    }
-
-    return "";
+  function getDeptFromProperties(p) {
+    const postcode = String(p.postcode || '').trim();
+    const citycode = String(p.citycode || '').trim();
+    if (citycode.startsWith('2A')) return '2A';
+    if (citycode.startsWith('2B')) return '2B';
+    if (postcode.startsWith('97') || postcode.startsWith('98')) return postcode.substring(0, 3);
+    if (postcode.length >= 2) return normalizeDept(postcode.substring(0, 2));
+    return '';
   }
 
   function hideSuggestions() {
-    suggestionsBox.innerHTML = "";
-    suggestionsBox.style.display = "none";
+    suggestionsBox.innerHTML = '';
+    suggestionsBox.style.display = 'none';
   }
 
   function showSuggestions(items) {
-    suggestionsBox.innerHTML = "";
-
+    suggestionsBox.innerHTML = '';
     if (!items.length) {
       suggestionsBox.innerHTML = "<div class='suggestion'>Aucun résultat</div>";
-      suggestionsBox.style.display = "block";
+      suggestionsBox.style.display = 'block';
       return;
     }
-
-    items.forEach(function(feature, index) {
-      var p = feature.properties || {};
-      var div = document.createElement("div");
-
-      div.className = "suggestion";
-      div.textContent = p.label || "";
-
-      div.addEventListener("click", function() {
-        selectAddress(index);
-      });
-
+    items.forEach(function (f, i) {
+      const div = document.createElement('div');
+      div.className = 'suggestion';
+      div.textContent = (f.properties || {}).label || '';
+      div.addEventListener('click', function () { selectAddress(i); });
       suggestionsBox.appendChild(div);
     });
-
-    suggestionsBox.style.display = "block";
+    suggestionsBox.style.display = 'block';
   }
-
-  function deptFromUAI(uai) {
-  uai = cleanKey(uai);
-
-  // Example: 0930043S -> 93
-  if (/^0[1-9]/.test(uai)) {
-    return String(parseInt(uai.substring(0, 3), 10));
-  }
-
-  // Example: 0711897B -> 71
-  if (/^[0-9]{3}/.test(uai)) {
-    return String(parseInt(uai.substring(0, 3), 10));
-  }
-
-  return "";
-}
-
-function parseSelectionCSV(text) {
-  var lines = text.trim().split(/\r?\n/);
-
-  // Remove header
-  lines.shift();
-
-  return lines
-    .map(function(line) {
-      return cleanKey(line.split(",")[0]);
-    })
-    .filter(function(uai) {
-      return uai.length > 0;
-    });
-}
 
   function fetchBAN(query) {
     clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      query = String(query || '').trim();
+      if (query.length < 2) { hideSuggestions(); return; }
 
-    debounceTimer = setTimeout(function() {
-      query = String(query || "").trim();
-
-      if (query.length < 2) {
-        hideSuggestions();
-        return;
-      }
-
-      if (isDepartmentQuery(query)) {
-        var dept = normalizeDepartmentQuery(query);
-
+      if (isDeptQuery(query)) {
+        const dept = normalizeDept(query);
         suggestions = [{
-          properties: {
-            label: "Charger le département " + dept,
-            type: "department",
-            dept: dept
-          },
+          properties: { label: 'Voir le département ' + dept, type: 'department', dept: dept },
           geometry: null
         }];
-
         showSuggestions(suggestions);
         return;
       }
 
-      fetch(
-        "https://data.geopf.fr/geocodage/search/?q=" +
-        encodeURIComponent(query) +
-        "&limit=20&autocomplete=1"
-      )
-        .then(function(res) {
-          return res.json();
-        })
-        .then(function(data) {
-          suggestions = (data.features || []).filter(function(f) {
-            return f.properties && (
-              f.properties.type === "housenumber" ||
-              f.properties.type === "street" ||
-              f.properties.type === "municipality"
-            );
+      fetch('https://data.geopf.fr/geocodage/search/?q=' +
+            encodeURIComponent(query) + '&limit=20&autocomplete=1')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          suggestions = (data.features || []).filter(function (f) {
+            const t = (f.properties || {}).type;
+            return t === 'housenumber' || t === 'street' || t === 'municipality';
           });
-
           showSuggestions(suggestions);
         })
-        .catch(function(err) {
-          console.error("Erreur BAN:", err);
-          hideSuggestions();
-        });
-
+        .catch(hideSuggestions);
     }, 250);
   }
 
-  fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges.json")
-    .then(function(res){
-      if (!res.ok) throw new Error("colleges.json not found");
-      return res.json();
-    })
-    .then(function(data){
-      data.forEach(function(c){
-        var key = cleanKey(c.UAI || c.uai || c.code_rne || "");
-        var nom = c.Nom || c.nom || c.nom_etab || "";
-
-        if (key) {
-          collegeLookup[key] = nom;
-        }
-      });
-
-      console.log("College lookup loaded:", Object.keys(collegeLookup).length);
-      loadSelectedColleges();
-    })
-    .catch(function(err){
-      console.error("Error loading colleges.json:", err);
-    });
-
-  function loadDepartment(dept, addressFeature) {
-    dept = normalizeDepartmentQuery(dept);
-
-    var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/cartescolaire_" + dept + ".geojson";
-
-    console.log("Loading:", file);
-
-    fetch(file)
-      .then(function(res) {
-        if (!res.ok) throw new Error("File not found: " + file);
-        return res.json();
-      })
-      .then(function(data) {
-
-        if (currentLayer) map.removeLayer(currentLayer);
-        if (currentOverlapLayer) map.removeLayer(currentOverlapLayer);
-        if (currentMarker) map.removeLayer(currentMarker);
-
-        currentLayer = L.geoJSON(data, {
-          style: function(feature) {
-            var uai = getUAI(feature);
-
-            if (!assignedColors[uai]) {
-              assignedColors[uai] = generateColor(uai);
-            }
-
-            return {
-              color: "black",
-              weight: 1,
-              fillColor: assignedColors[uai],
-              fillOpacity: 0.25
-            };
-          },
-
-          onEachFeature: function(feature, layer) {
-            var uai = getUAI(feature);
-            var name = collegeLookup[uai] || "Nom inconnu";
-
-            layer.bindPopup(
-              "UAI: " + (uai || "missing") + "<br>" +
-              "Nom: " + name
-            );
-          }
-        }).addTo(map);
-
-        var hasPoint =
-  addressFeature &&
-  addressFeature.geometry &&
-  addressFeature.geometry.coordinates &&
-  addressFeature.geometry.coordinates.length >= 2;
-
-var selectionType = addressFeature && addressFeature.properties
-  ? addressFeature.properties.type
-  : "";
-
-var showCollegeForPoint = hasPoint && selectionType === "housenumber";
-
-if (showCollegeForPoint) {
-  var coords = addressFeature.geometry.coordinates;
-  var lng = coords[0];
-  var lat = coords[1];
-
-  currentMarker = L.marker([lat, lng]).addTo(map);
-
-  var point = turf.point([lng, lat]);
-  var collegesAtAddress = [];
-
-          (data.features || []).forEach(function(poly) {
-            try {
-              if (
-                turf.booleanPointInPolygon(point, poly, { ignoreBoundary: false }) ||
-                turf.booleanIntersects(point, poly)
-              ) {
-                var uai = getUAI(poly);
-                var nom = collegeLookup[uai] || "Nom inconnu";
-
-                collegesAtAddress.push({
-                  uai: uai,
-                  nom: nom
-                });
-              }
-            } catch (e) {
-              console.warn("Erreur point-in-polygon:", e);
-            }
-          });
-
-          var popupHtml = "<b>Adresse sélectionnée</b><br>" +
-            (addressFeature.properties.label || "") + "<br><br>";
-
-          if (collegesAtAddress.length > 0) {
-            popupHtml += "<b>Collège(s) associé(s)</b><br>";
-
-            collegesAtAddress.forEach(function(c) {
-              popupHtml +=
-                "UAI: " + (c.uai || "missing") + "<br>" +
-                "Nom: " + c.nom + "<br><br>";
-            });
-          } else {
-            popupHtml += "<b>Aucun collège trouvé</b>";
-          }
-
-          currentMarker.bindPopup(popupHtml).openPopup();
-        }
-
-        var overlaps = [];
-        var features = data.features || [];
-
-        for (var i = 0; i < features.length; i++) {
-          for (var j = i + 1; j < features.length; j++) {
-            var f1 = features[i];
-            var f2 = features[j];
-
-            try {
-              var intersection = turf.intersect(f1, f2);
-
-              if (intersection) {
-                intersection.properties = {
-                  UAI_1: getUAI(f1),
-                  UAI_2: getUAI(f2)
-                };
-
-                overlaps.push(intersection);
-              }
-            } catch (e) {
-              console.warn("Intersection failed:", i, j, e);
-            }
-          }
-        }
-
-        console.log("Overlaps found:", overlaps.length);
-
-        currentOverlapLayer = L.geoJSON(overlaps, {
-          style: function(feature) {
-            return {
-              color: "red",
-              weight: 2,
-              fillColor: "red",
-              fillOpacity: 0.2
-            };
-          },
-
-          onEachFeature: function(feature, layer) {
-            var u1 = feature.properties.UAI_1;
-            var u2 = feature.properties.UAI_2;
-
-            var n1 = collegeLookup[u1] || "Nom inconnu";
-            var n2 = collegeLookup[u2] || "Nom inconnu";
-
-            layer.bindPopup(
-              "Overlap between:<br>" +
-              "UAI 1: " + u1 + "<br>" +
-              "Nom 1: " + n1 + "<br><br>" +
-              "UAI 2: " + u2 + "<br>" +
-              "Nom 2: " + n2
-            );
-          }
-        }).addTo(map);
-
-        currentOverlapLayer.bringToFront();
-
-      map.fitBounds(currentLayer.getBounds(), { padding: [40, 40] });
-
-      })
-      .catch(function(err) {
-        alert(err.message);
-        console.error(err);
-      });
-  }
-
-
-  function loadSelectedColleges() {
-  fetch("https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv")
-    .then(function(res) {
-      if (!res.ok) throw new Error("selection.csv not found: " + res.status);
-      return res.text();
-    })
-    .then(function(csvText) {
-      console.log("selection.csv content preview:", csvText.slice(0, 200));
-
-      var selectedUAIs = parseSelectionCSV(csvText);
-      console.log("Selected UAIs:", selectedUAIs);
-
-      selectedUAIs.forEach(function(uai) {
-        selectedUAISet.add(uai);
-      });
-
-      var departments = {};
-
-      selectedUAIs.forEach(function(uai) {
-        var dept = deptFromUAI(uai);
-        console.log("UAI:", uai, "dept:", dept);
-        if (dept) departments[dept] = true;
-      });
-
-      Object.keys(departments).forEach(function(dept) {
-        var file = "https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/cartescolaire_" + dept + ".geojson";
-
-        fetch(file)
-          .then(function(res) {
-            if (!res.ok) throw new Error("File not found: " + file);
-            return res.json();
-          })
-          .then(function(data) {
-            var selectedFeatures = (data.features || []).filter(function(feature) {
-              return selectedUAISet.has(getUAI(feature));
-            });
-
-            console.log("Dept", dept, "matched polygons:", selectedFeatures.length);
-
-            if (!selectedFeatures.length) return;
-
-            var layer = L.geoJSON(selectedFeatures, {
-              style: function(feature) {
-                var uai = getUAI(feature);
-
-                if (!assignedColors[uai]) {
-                  assignedColors[uai] = generateColor(uai);
-                }
-
-                return {
-                  color: "black",
-                  weight: 2,
-                  fillColor: assignedColors[uai],
-                  fillOpacity: 0.55
-                };
-              },
-
-              onEachFeature: function(feature, layer) {
-                var uai = getUAI(feature);
-                var name = collegeLookup[uai] || "Nom inconnu";
-
-                layer.bindPopup(
-                  "UAI: " + uai + "<br>" +
-                  "Nom: " + name
-                );
-              }
-            }).addTo(map);
-
-            selectedLayers.push(layer);
-
-            var group = L.featureGroup(selectedLayers);
-            map.fitBounds(group.getBounds(), { padding: [40, 40] });
-          })
-          .catch(function(err) {
-            console.error(err);
-          });
-      });
-    })
-    .catch(function(err) {
-      console.error("Error loading selection.csv:", err);
-      alert(err.message);
-    });
-}
   function selectAddress(index) {
-    var feature = suggestions[index];
+    const feature = suggestions[index];
     if (!feature) return;
+    const p = feature.properties || {};
 
-    var p = feature.properties || {};
-
-    if (p.type === "department") {
-      input.value = p.label || "";
-      hideSuggestions();
-      loadDepartment(p.dept, null);
-      return;
-    }
-
-    var dept = getDepartementFromAddressProperties(p);
-
-    if (!dept) {
-      alert("Impossible de déterminer le département pour cette sélection.");
-      return;
-    }
-
-    input.value = p.label || "";
+    if (currentMarker) { currentMarker.remove(); currentMarker = null; }
+    input.value = p.label || '';
     hideSuggestions();
 
-    console.log("Sélection:", p.label);
-    console.log("Département:", dept);
+    if (p.type === 'department') {
+      zoomToDepartment(p.dept);
+      return;
+    }
 
-    loadDepartment(dept, feature);
+    const coords = feature.geometry && feature.geometry.coordinates;
+    if (!coords) return;
+    const [lng, lat] = coords;
+
+    if (p.type === 'housenumber') {
+      map.flyTo({ center: [lng, lat], zoom: 14 });
+      currentMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
+
+      // Wait until tiles at the new zoom are fully rendered before querying
+      map.once('idle', function () {
+        const px       = map.project([lng, lat]);
+        const features = map.queryRenderedFeatures(px, { layers: ['zones-fill'] });
+
+        let html = '<b>' + (p.label || '') + '</b><br><br>';
+        if (features.length > 0) {
+          html += '<b>Collège(s) associé(s)</b><br>';
+          const seen = new Set();
+          features.forEach(function (f) {
+            const uai = f.properties.code_rne || '';
+            if (seen.has(uai)) return;
+            seen.add(uai);
+            html += 'UAI&nbsp;: ' + uai + '<br>' +
+                    'Nom&nbsp;: ' + (f.properties.nom || 'Nom inconnu') + '<br><br>';
+          });
+        } else {
+          html += '<b>Aucun collège trouvé</b>';
+        }
+
+        new maplibregl.Popup()
+          .setLngLat([lng, lat])
+          .setHTML(html)
+          .addTo(map);
+      });
+
+    } else {
+      map.flyTo({ center: [lng, lat], zoom: 11 });
+    }
   }
 
-  input.addEventListener("input", function() {
-    fetchBAN(input.value);
+  function zoomToDepartment(dept) {
+    // geo.api.gouv.fr returns the centroid of the department
+    fetch('https://geo.api.gouv.fr/departements/' +
+          encodeURIComponent(dept) + '?fields=centre')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.centre && d.centre.coordinates) {
+          map.flyTo({ center: d.centre.coordinates, zoom: 9 });
+        }
+      })
+      .catch(function () {});
+  }
+
+  // ── Click popup on zones ───────────────────────────────────────────────────
+
+  map.on('click', 'zones-fill', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        'UAI&nbsp;: ' + (f.code_rne || '') + '<br>' +
+        'Nom&nbsp;: ' + (f.nom || 'Nom inconnu') +
+        (f.multisecteur ? '<br><i>Multi-secteur</i>' : '')
+      )
+      .addTo(map);
   });
 
-  document.addEventListener("click", function(e) {
-    if (!suggestionsBox.contains(e.target) && e.target !== input) {
-      hideSuggestions();
-    }
+  map.on('mouseenter', 'zones-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'zones-fill', function () { map.getCanvas().style.cursor = ''; });
+
+  // ── Selection CSV ──────────────────────────────────────────────────────────
+
+  function parseSelectionCSV(text) {
+    return text.trim().split(/\r?\n/).slice(1)
+      .map(function (l) { return l.split(',')[0].trim().toUpperCase().replace(/\s+/g, ''); })
+      .filter(function (u) { return u.length > 0; });
+  }
+
+  map.on('load', function () {
+    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv')
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function (csv) {
+        const uais = parseSelectionCSV(csv);
+        if (uais.length > 0) {
+          // Legacy filter syntax: ['in', property, v1, v2, ...]
+          map.setFilter('zones-selected', ['in', 'code_rne'].concat(uais));
+        }
+      })
+      .catch(function () {});
   });
 
-});
+  // ── Input events ───────────────────────────────────────────────────────────
+
+  input.addEventListener('input', function () { fetchBAN(input.value); });
+  document.addEventListener('click', function (e) {
+    if (!suggestionsBox.contains(e.target) && e.target !== input) hideSuggestions();
+  });
+
+})();
 </script>
-
 </body>
 </html>
