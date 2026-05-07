@@ -71,7 +71,7 @@
   const protocol = new pmtiles.Protocol();
   maplibregl.addProtocol('pmtiles', protocol.tile.bind(protocol));
 
-  const PMTILES      = 'pmtiles://https://raw.githubusercontent.com/memeriau/cartescolaire/main/cartescolaire.pmtiles';
+  const PMTILES      = 'pmtiles://https://mathildeemeriau.com/cartescolaire/cartescolaire.pmtiles';
   const SOURCE_LAYER = 'zones';
 
   const map = new maplibregl.Map({
@@ -97,7 +97,7 @@
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           paint: {
-            'fill-color': ['hsl', ['get', 'hue'], 70, 55],
+            'fill-color': ['to-color', ['get', 'color']],
             'fill-opacity': 0.25
           }
         },
@@ -110,7 +110,7 @@
           'source-layer': SOURCE_LAYER,
           filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
           paint: {
-            'fill-color': ['hsl', ['get', 'hue'], 70, 55],
+            'fill-color': ['to-color', ['get', 'color']],
             'fill-opacity': 0.55
           }
         },
