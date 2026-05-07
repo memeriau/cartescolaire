@@ -96,6 +96,7 @@
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
+          filter: ['!=', ['get', 'is_overlap'], 1],
           paint: {
             'fill-color': ['to-color', ['get', 'color']],
             'fill-opacity': 0.25
@@ -121,15 +122,17 @@
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
-          filter: ['==', ['get', 'multisecteur'], 1],
+          filter: ['all', ['!=', ['get', 'is_overlap'], 1], ['==', ['get', 'multisecteur'], 1]],
           paint: { 'fill-color': '#0000ff', 'fill-opacity': 0.12 }
         },
 
+        // Overlapping zones – red
         {
           id: 'overlaps-fill',
           type: 'fill',
           source: 'cs',
-          'source-layer': 'overlaps',
+          'source-layer': SOURCE_LAYER,
+          filter: ['==', ['get', 'is_overlap'], 1],
           paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.45 }
         },
         {
@@ -296,6 +299,7 @@
   map.on('click', 'zones-fill', function (e) {
     if (!e.features || !e.features.length) return;
     const f = e.features[0].properties;
+    if (f.is_overlap) return;  // let overlaps-fill handler take it
     new maplibregl.Popup()
       .setLngLat(e.lngLat)
       .setHTML(
