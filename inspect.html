@@ -46,6 +46,32 @@
 
     .suggestion:hover { background: #f0f0f0; }
 
+    #layerToggles {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: #333;
+    }
+
+    #layerToggles label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .legend-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
     .maplibregl-popup-content {
       font-family: Arial, sans-serif;
       font-size: 13px;
@@ -91,6 +117,18 @@
 <div id="searchBox">
   <input id="addressInput" type="text" placeholder="Adresse, commune ou département..." />
   <div id="suggestions"></div>
+  <div id="layerToggles">
+    <label>
+      <input type="checkbox" id="toggleOverlaps" checked />
+      <span class="legend-swatch" style="background:rgba(255,0,0,0.75);"></span>
+      Zones de recouvrement
+    </label>
+    <label>
+      <input type="checkbox" id="toggleOverlapsMultisecteur" checked />
+      <span class="legend-swatch" style="background:rgba(255,128,0,0.75);"></span>
+      Recouvrement multi-secteur
+    </label>
+  </div>
 </div>
 <div id="map"></div>
 
@@ -159,14 +197,24 @@
           paint: { 'fill-color': '#0000ff', 'fill-opacity': 0.12 }
         },
 
-        // Overlapping zones – red
+        // Overlapping zones – red (genuine data overlaps)
         {
           id: 'overlaps-fill',
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
-          filter: ['has', 'uai_1'],
+          filter: ['all', ['has', 'uai_1'], ['==', ['get', 'multisecteur_overlap'], 0]],
           paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.75 }
+        },
+
+        // Overlapping zones – orange (intentional multi-secteur overlaps)
+        {
+          id: 'overlaps-multisecteur-fill',
+          type: 'fill',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          filter: ['all', ['has', 'uai_1'], ['==', ['get', 'multisecteur_overlap'], 1]],
+          paint: { 'fill-color': '#ff8000', 'fill-opacity': 0.75 }
         },
         {
           id: 'zones-outline',
@@ -331,7 +379,7 @@
 
   map.on('click', 'zones-fill', function (e) {
     if (!e.features || !e.features.length) return;
-    if (map.queryRenderedFeatures(e.point, { layers: ['overlaps-fill'] }).length > 0) return;
+    if (map.queryRenderedFeatures(e.point, { layers: ['overlaps-fill', 'overlaps-multisecteur-fill'] }).length > 0) return;
     const f = e.features[0].properties;
     new maplibregl.Popup()
       .setLngLat(e.lngLat)
@@ -363,6 +411,39 @@
 
   map.on('mouseenter', 'overlaps-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'overlaps-fill', function () { map.getCanvas().style.cursor = ''; });
+
+  map.on('click', 'overlaps-multisecteur-fill', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        '<b>Zone de recouvrement (multi-secteur)</b><br><br>' +
+        'UAI&nbsp;: ' + (f.uai_1 || '') + '<br>' +
+        'Nom&nbsp;: ' + (f.nom_1 || 'Nom inconnu') + '<br><br>' +
+        'UAI&nbsp;: ' + (f.uai_2 || '') + '<br>' +
+        'Nom&nbsp;: ' + (f.nom_2 || 'Nom inconnu')
+      )
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'overlaps-multisecteur-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'overlaps-multisecteur-fill', function () { map.getCanvas().style.cursor = ''; });
+
+  // ── Layer toggles ─────────────────────────────────────────────────────────
+
+  function setOverlapVisibility(layerId, visible) {
+    map.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+  }
+
+  map.on('load', function () {
+    document.getElementById('toggleOverlaps').addEventListener('change', function () {
+      setOverlapVisibility('overlaps-fill', this.checked);
+    });
+    document.getElementById('toggleOverlapsMultisecteur').addEventListener('change', function () {
+      setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
+    });
+  });
 
   // ── Selection CSV ──────────────────────────────────────────────────────────
 
