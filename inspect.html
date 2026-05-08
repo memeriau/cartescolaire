@@ -153,7 +153,7 @@
       </label>
       <label>
         <input type="checkbox" id="toggleSelectionOnly" />
-        <span class="legend-swatch" style="background:#888;border:1px solid #555;"></span>
+        <span class="legend-swatch" style="background:rgba(42,157,63,0.55);border:1px solid #1a7a2f;"></span>
         Sélection uniquement
       </label>
     </div>
@@ -207,7 +207,7 @@
           }
         },
 
-        // Selected colleges (from selection.csv) – higher opacity
+        // Selected colleges (from selection.csv) – green
         {
           id: 'zones-selected',
           type: 'fill',
@@ -215,8 +215,8 @@
           'source-layer': SOURCE_LAYER,
           filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
           paint: {
-            'fill-color': ['to-color', ['get', 'color']],
-            'fill-opacity': 0.20
+            'fill-color': '#2a9d3f',
+            'fill-opacity': 0.55
           }
         },
 
@@ -474,9 +474,7 @@
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
     });
     document.getElementById('toggleSelectionOnly').addEventListener('change', function () {
-      const selOnly = this.checked;
-      map.setLayoutProperty('zones-fill', 'visibility', selOnly ? 'none' : 'visible');
-      map.setPaintProperty('zones-selected', 'fill-opacity', selOnly ? 0.55 : 0.20);
+      map.setLayoutProperty('zones-fill', 'visibility', this.checked ? 'none' : 'visible');
     });
   });
 
