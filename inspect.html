@@ -9,12 +9,18 @@
     html, body { height: 100%; margin: 0; }
     #map { height: 100%; width: 100%; }
 
-    #searchBox {
+    #leftPanel {
       position: absolute;
       z-index: 1000;
       top: 10px;
       left: 10px;
-      width: 420px;
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #searchBox, #collegeSearchBox {
       background: white;
       padding: 10px;
       border-radius: 6px;
@@ -107,19 +113,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    #collegeSearchBox {
-      position: absolute;
-      z-index: 1000;
-      top: 10px;
-      right: 10px;
-      width: 300px;
-      background: white;
-      padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      font-family: Arial, sans-serif;
-    }
-
     #collegeInput {
       width: 100%;
       box-sizing: border-box;
@@ -143,25 +136,27 @@
   <div id="loading-spinner"></div>
   Chargement de la carte…
 </div>
-<div id="searchBox">
-  <input id="addressInput" type="text" placeholder="Adresse, commune ou département..." />
-  <div id="suggestions"></div>
-  <div id="layerToggles">
-    <label>
-      <input type="checkbox" id="toggleOverlaps" checked />
-      <span class="legend-swatch" style="background:rgba(255,0,0,0.75);"></span>
-      Zones de recouvrement
-    </label>
-    <label>
-      <input type="checkbox" id="toggleOverlapsMultisecteur" checked />
-      <span class="legend-swatch" style="background:rgba(0,0,139,0.75);"></span>
-      Recouvrement multi-secteur
-    </label>
+<div id="leftPanel">
+  <div id="searchBox">
+    <input id="addressInput" type="text" placeholder="Adresse, commune ou département..." />
+    <div id="suggestions"></div>
+    <div id="layerToggles">
+      <label>
+        <input type="checkbox" id="toggleOverlaps" checked />
+        <span class="legend-swatch" style="background:rgba(255,0,0,0.75);"></span>
+        Zones de recouvrement
+      </label>
+      <label>
+        <input type="checkbox" id="toggleOverlapsMultisecteur" checked />
+        <span class="legend-swatch" style="background:rgba(0,0,139,0.75);"></span>
+        Recouvrement multi-secteur
+      </label>
+    </div>
   </div>
-</div>
-<div id="collegeSearchBox">
-  <input id="collegeInput" type="text" placeholder="Rechercher un collège..." />
-  <div id="collegeSuggestions"></div>
+  <div id="collegeSearchBox">
+    <input id="collegeInput" type="text" placeholder="Rechercher un collège..." />
+    <div id="collegeSuggestions"></div>
+  </div>
 </div>
 <div id="map"></div>
 
@@ -551,21 +546,22 @@
         const div = document.createElement('div');
         div.className = 'suggestion';
         div.textContent = c.Nom + ' (' + c.UAI + ')';
-        div.addEventListener('click', function () { selectCollege(c.UAI, c.Nom); });
+        div.addEventListener('click', function () { selectCollege(c.UAI, c.Nom, c.lon, c.lat); });
         collegeSuggestions.appendChild(div);
       });
       collegeSuggestions.style.display = 'block';
     }, 200);
   }
 
-  function selectCollege(uai, nom) {
+  function selectCollege(uai, nom, lon, lat) {
     collegeInput.value = nom + ' (' + uai + ')';
     hideCollegeSuggestions();
     map.setFilter('zones-highlight', ['==', 'code_rne', uai]);
+    if (lon != null && lat != null) map.flyTo({ center: [lon, lat], zoom: 13 });
   }
 
   collegeInput.addEventListener('input', function () {
-    if (!collegeInput.value.trim()) map.setFilter('zones-highlight', ['==', 'code_rne', '']);
+    map.setFilter('zones-highlight', ['==', 'code_rne', '']);
     searchColleges(collegeInput.value);
   });
 
