@@ -151,6 +151,11 @@
         <span class="legend-swatch" style="background:rgba(0,0,139,0.75);"></span>
         Zone multi-collèges
       </label>
+      <label>
+        <input type="checkbox" id="toggleSelectionOnly" />
+        <span class="legend-swatch" style="background:#888;border:1px solid #555;"></span>
+        Sélection uniquement
+      </label>
     </div>
   </div>
   <div id="collegeSearchBox">
@@ -467,6 +472,11 @@
     });
     document.getElementById('toggleOverlapsMultisecteur').addEventListener('change', function () {
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
+    });
+    document.getElementById('toggleSelectionOnly').addEventListener('change', function () {
+      const selOnly = this.checked;
+      map.setLayoutProperty('zones-fill', 'visibility', selOnly ? 'none' : 'visible');
+      map.setPaintProperty('zones-selected', 'fill-opacity', selOnly ? 0.55 : 0.20);
     });
   });
 
