@@ -106,6 +106,35 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    #collegeSearchBox {
+      position: absolute;
+      z-index: 1000;
+      top: 10px;
+      right: 10px;
+      width: 300px;
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      font-family: Arial, sans-serif;
+    }
+
+    #collegeInput {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    #collegeSuggestions {
+      margin-top: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      display: none;
+      background: white;
+    }
   </style>
 </head>
 <body>
@@ -129,6 +158,10 @@
       Recouvrement multi-secteur
     </label>
   </div>
+</div>
+<div id="collegeSearchBox">
+  <input id="collegeInput" type="text" placeholder="Rechercher un collège..." />
+  <div id="collegeSuggestions"></div>
 </div>
 <div id="map"></div>
 
@@ -222,6 +255,14 @@
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           paint: { 'line-color': '#000000', 'line-width': 0.5 }
+        },
+        {
+          id: 'zones-highlight',
+          type: 'line',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          filter: ['==', 'code_rne', ''],
+          paint: { 'line-color': '#000000', 'line-width': 3 }
         }
       ]
     },
@@ -469,6 +510,67 @@
         }
       })
       .catch(function () {});
+  });
+
+  // ── College search ────────────────────────────────────────────────────────
+
+  const collegeInput       = document.getElementById('collegeInput');
+  const collegeSuggestions = document.getElementById('collegeSuggestions');
+  let colleges         = [];
+  let collegeDebounce  = null;
+
+  map.on('load', function () {
+    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges.json')
+      .then(function (r) { return r.json(); })
+      .then(function (data) { colleges = data; })
+      .catch(function () {});
+  });
+
+  function hideCollegeSuggestions() {
+    collegeSuggestions.innerHTML = '';
+    collegeSuggestions.style.display = 'none';
+  }
+
+  function searchColleges(query) {
+    clearTimeout(collegeDebounce);
+    collegeDebounce = setTimeout(function () {
+      query = query.trim().toLowerCase();
+      if (query.length < 2) { hideCollegeSuggestions(); return; }
+
+      const results = colleges.filter(function (c) {
+        return c.Nom.toLowerCase().includes(query) || c.UAI.toLowerCase().includes(query);
+      }).slice(0, 10);
+
+      collegeSuggestions.innerHTML = '';
+      if (!results.length) {
+        collegeSuggestions.innerHTML = "<div class='suggestion'>Aucun résultat</div>";
+        collegeSuggestions.style.display = 'block';
+        return;
+      }
+      results.forEach(function (c) {
+        const div = document.createElement('div');
+        div.className = 'suggestion';
+        div.textContent = c.Nom + ' (' + c.UAI + ')';
+        div.addEventListener('click', function () { selectCollege(c.UAI, c.Nom); });
+        collegeSuggestions.appendChild(div);
+      });
+      collegeSuggestions.style.display = 'block';
+    }, 200);
+  }
+
+  function selectCollege(uai, nom) {
+    collegeInput.value = nom + ' (' + uai + ')';
+    hideCollegeSuggestions();
+    map.setFilter('zones-highlight', ['==', 'code_rne', uai]);
+  }
+
+  collegeInput.addEventListener('input', function () {
+    if (!collegeInput.value.trim()) map.setFilter('zones-highlight', ['==', 'code_rne', '']);
+    searchColleges(collegeInput.value);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!collegeSuggestions.contains(e.target) && e.target !== collegeInput) hideCollegeSuggestions();
   });
 
   // ── Input events ───────────────────────────────────────────────────────────
