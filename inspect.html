@@ -149,7 +149,7 @@
       <label>
         <input type="checkbox" id="toggleOverlapsMultisecteur" checked />
         <span class="legend-swatch" style="background:rgba(0,0,139,0.75);"></span>
-        Recouvrement multi-secteur
+        Zone multi-collèges
       </label>
     </div>
   </div>
@@ -421,8 +421,7 @@
       .setLngLat(e.lngLat)
       .setHTML(
         'UAI&nbsp;: ' + (f.code_rne || '') + '<br>' +
-        'Nom&nbsp;: ' + (f.nom || 'Nom inconnu') +
-        (f.multisecteur ? '<br><i>Multi-secteur</i>' : '')
+        'Nom&nbsp;: ' + (f.nom || 'Nom inconnu')
       )
       .addTo(map);
   });
@@ -454,7 +453,7 @@
     new maplibregl.Popup()
       .setLngLat(e.lngLat)
       .setHTML(
-        '<b>Zone de recouvrement (multi-secteur)</b><br><br>' +
+        '<b>Zone multi-collèges</b><br><br>' +
         'UAI&nbsp;: ' + (f.uai_1 || '') + '<br>' +
         'Nom&nbsp;: ' + (f.nom_1 || 'Nom inconnu') + '<br><br>' +
         'UAI&nbsp;: ' + (f.uai_2 || '') + '<br>' +
