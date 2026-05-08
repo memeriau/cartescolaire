@@ -215,16 +215,6 @@
           }
         },
 
-        // Multi-secteur zones – blue tint
-        {
-          id: 'zones-multisecteur',
-          type: 'fill',
-          source: 'cs',
-          'source-layer': SOURCE_LAYER,
-          filter: ['all', ['!', ['has', 'uai_1']], ['==', ['get', 'multisecteur'], 1]],
-          paint: { 'fill-color': '#0000ff', 'fill-opacity': 0.12 }
-        },
-
         // Overlapping zones – red (genuine data overlaps)
         {
           id: 'overlaps-fill',
@@ -477,7 +467,6 @@
     });
     document.getElementById('toggleOverlapsMultisecteur').addEventListener('change', function () {
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
-      setOverlapVisibility('zones-multisecteur', this.checked);
     });
   });
 
