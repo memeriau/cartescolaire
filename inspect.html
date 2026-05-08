@@ -125,7 +125,7 @@
     </label>
     <label>
       <input type="checkbox" id="toggleOverlapsMultisecteur" checked />
-      <span class="legend-swatch" style="background:rgba(255,128,0,0.75);"></span>
+      <span class="legend-swatch" style="background:rgba(0,0,139,0.75);"></span>
       Recouvrement multi-secteur
     </label>
   </div>
@@ -203,18 +203,18 @@
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
-          filter: ['all', ['has', 'uai_1'], ['==', ['get', 'multisecteur_overlap'], 0]],
+          filter: ['all', ['has', 'uai_1'], ['!', ['has', 'multisecteur_overlap']]],
           paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.75 }
         },
 
-        // Overlapping zones – orange (intentional multi-secteur overlaps)
+        // Overlapping zones – dark blue (intentional multi-secteur overlaps)
         {
           id: 'overlaps-multisecteur-fill',
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
-          filter: ['all', ['has', 'uai_1'], ['==', ['get', 'multisecteur_overlap'], 1]],
-          paint: { 'fill-color': '#ff8000', 'fill-opacity': 0.75 }
+          filter: ['all', ['has', 'uai_1'], ['has', 'multisecteur_overlap']],
+          paint: { 'fill-color': '#00008b', 'fill-opacity': 0.75 }
         },
         {
           id: 'zones-outline',
