@@ -241,13 +241,14 @@
           }
         },
 
-        // Selected colleges (from selection.csv) – green
+        // Selected colleges (from selection.csv) – green; visibility driven by toggleSelectionOnly
         {
           id: 'zones-selected',
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
+          layout: { visibility: 'visible' },
           paint: {
             'fill-color': '#228B22',
             'fill-opacity': 0.25
@@ -549,7 +550,7 @@
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
     });
     document.getElementById('toggleSelectionOnly').addEventListener('change', function () {
-      map.setPaintProperty('zones-fill', 'fill-opacity', this.checked ? 0 : 0.12);
+      map.setLayoutProperty('zones-selected', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
 
