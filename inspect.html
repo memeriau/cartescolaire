@@ -171,6 +171,11 @@
         <span class="legend-swatch" style="background:#cc0000;border-radius:50%;"></span>
         Écoles élémentaires (public / privé)
       </label>
+      <label>
+        <input type="checkbox" id="toggleCollegesPrives" checked />
+        <span class="legend-swatch" style="background:#e67e00;border-radius:50%;"></span>
+        Collèges privés
+      </label>
     </div>
   </div>
   <div id="collegeSearchBox">
@@ -606,6 +611,48 @@
       map.setLayoutProperty('ecoles-circles', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
+
+  // ── Collèges privés ───────────────────────────────────────────────────────
+
+  map.on('load', function () {
+    map.addSource('colleges-prives', {
+      type: 'geojson',
+      data: 'raw/colleges_prives.geojson'
+    });
+
+    map.addLayer({
+      id: 'colleges-prives-circles',
+      type: 'circle',
+      source: 'colleges-prives',
+      paint: {
+        'circle-color': '#e67e00',
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 2.5, 14, 4],
+        'circle-opacity': 0.85,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#ffffff'
+      }
+    });
+
+    document.getElementById('toggleCollegesPrives').addEventListener('change', function () {
+      map.setLayoutProperty('colleges-prives-circles', 'visibility', this.checked ? 'visible' : 'none');
+    });
+  });
+
+  map.on('click', 'colleges-prives-circles', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        '<b>' + (f.nom || 'Collège inconnu') + '</b><br>' +
+        (f.secteur || '') + '<br>' +
+        'UAI&nbsp;: ' + (f.uai || '')
+      )
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'colleges-prives-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'colleges-prives-circles', function () { map.getCanvas().style.cursor = ''; });
 
   map.on('click', 'ecoles-circles', function (e) {
     if (!e.features || !e.features.length) return;
