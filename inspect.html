@@ -192,7 +192,7 @@
       </label>
       <label>
         <input type="checkbox" id="toggleIPS" />
-        <span class="legend-swatch" style="background:linear-gradient(to right,#111,#ddd);border:1px solid #bbb;"></span>
+        <span class="legend-swatch" style="background:linear-gradient(to right,#ddd,#111);border:1px solid #bbb;"></span>
         IPS collèges (2022)
       </label>
     </div>
@@ -833,88 +833,56 @@
     map.on('mouseleave', _lid, function () { map.getCanvas().style.cursor = ''; });
   }
 
-  // ── IPS des collèges ─────────────────────────────────────────────────────
+  // ── IPS des collèges (zones colorées) ────────────────────────────────────
 
   map.on('load', function () {
-    Promise.all([
-      fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/fr-en-ips-colleges-ap2022.csv').then(function (r) { return r.text(); }),
-      fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges_publics.geojson').then(function (r) { return r.json(); }),
-      fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges_prives.geojson').then(function (r) { return r.json(); })
-    ]).then(function (results) {
-      var csvText = results[0].replace(/^﻿/, '');
-      var pubGeo  = results[1];
-      var privGeo = results[2];
+    // Layer added immediately (hidden); fill-color set once CSV is parsed
+    map.addLayer({
+      id: 'zones-ips-fill',
+      type: 'fill',
+      source: 'cs',
+      'source-layer': SOURCE_LAYER,
+      filter: ['!', ['has', 'uai_1']],
+      layout: { visibility: 'none' },
+      paint: { 'fill-color': '#cccccc', 'fill-opacity': 0.75 }
+    }, 'zones-fill');  // insert below the transparent click-target layer
 
-      // Build UAI → IPS lookup (semicolon-delimited, UAI col 4, IPS col 10)
-      var ipsMap = {};
-      var lines = csvText.trim().split(/\r?\n/);
-      for (var i = 1; i < lines.length; i++) {
-        var cols = lines[i].split(';');
-        var uai  = (cols[4] || '').trim().toUpperCase();
-        var ips  = parseFloat((cols[10] || '').replace(',', '.'));
-        if (uai && !isNaN(ips)) ipsMap[uai] = ips;
-      }
-
-      // Merge public + private, keeping only colleges with an IPS score
-      var features = [];
-      [pubGeo, privGeo].forEach(function (geo) {
-        (geo.features || []).forEach(function (f) {
-          var uai = ((f.properties || {}).uai || '').toUpperCase();
-          var ips = ipsMap[uai];
-          if (ips !== undefined) {
-            features.push({
-              type: 'Feature',
-              geometry: f.geometry,
-              properties: { uai: uai, nom: f.properties.nom || '', ips: ips }
-            });
-          }
-        });
-      });
-
-      map.addSource('colleges-ips', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: features }
-      });
-
-      map.addLayer({
-        id: 'colleges-ips-circles',
-        type: 'circle',
-        source: 'colleges-ips',
-        layout: { visibility: 'none' },
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2, 10, 4, 14, 7],
-          'circle-color': ['interpolate', ['linear'], ['get', 'ips'],
-            50,  '#111111',
-            100, '#777777',
-            160, '#dddddd'
-          ],
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 0.5,
-          'circle-opacity': 0.9
+    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/fr-en-ips-colleges-ap2022.csv')
+      .then(function (r) { return r.text(); })
+      .then(function (csvText) {
+        csvText = csvText.replace(/^﻿/, '');
+        var ipsMap = {};
+        var lines = csvText.trim().split(/\r?\n/);
+        for (var i = 1; i < lines.length; i++) {
+          var cols = lines[i].split(';');
+          var uai  = (cols[4] || '').trim().toUpperCase();
+          var ips  = parseFloat((cols[10] || '').replace(',', '.'));
+          if (uai && !isNaN(ips)) ipsMap[uai] = ips;
         }
-      });
 
-      document.getElementById('toggleIPS').addEventListener('change', function () {
-        map.setLayoutProperty('colleges-ips-circles', 'visibility', this.checked ? 'visible' : 'none');
-      });
-    }).catch(function () {});
+        // IPS 50 → light gray #ddd, IPS 160 → dark gray #111
+        function ipsToGray(ips) {
+          var t = Math.max(0, Math.min(1, (ips - 50) / 110));
+          var v = Math.round(0xdd - t * (0xdd - 0x11));
+          var h = v.toString(16).padStart(2, '0');
+          return '#' + h + h + h;
+        }
+
+        // Build ['match', ['get', 'code_rne'], uai1, color1, uai2, color2, ..., fallback]
+        var matchExpr = ['match', ['get', 'code_rne']];
+        Object.keys(ipsMap).forEach(function (uai) {
+          matchExpr.push(uai, ipsToGray(ipsMap[uai]));
+        });
+        matchExpr.push('#cccccc');  // fallback for zones with no IPS data
+
+        map.setPaintProperty('zones-ips-fill', 'fill-color', matchExpr);
+      })
+      .catch(function () {});
+
+    document.getElementById('toggleIPS').addEventListener('change', function () {
+      map.setLayoutProperty('zones-ips-fill', 'visibility', this.checked ? 'visible' : 'none');
+    });
   });
-
-  map.on('click', 'colleges-ips-circles', function (e) {
-    if (!e.features || !e.features.length) return;
-    var f = e.features[0].properties;
-    new maplibregl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(
-        '<b>' + (f.nom || 'Collège inconnu') + '</b><br>' +
-        'UAI&nbsp;: ' + (f.uai || '') + '<br>' +
-        'IPS&nbsp;: ' + (f.ips != null ? f.ips : 'N/A')
-      )
-      .addTo(map);
-  });
-
-  map.on('mouseenter', 'colleges-ips-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'colleges-ips-circles', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Input events ───────────────────────────────────────────────────────────
 
