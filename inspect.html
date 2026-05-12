@@ -496,7 +496,7 @@
 
   // ── Icon helpers ──────────────────────────────────────────────────────────
 
-  function makeStarCanvas(color, sz) {
+  function makeStarImageData(color, sz) {
     var canvas = document.createElement('canvas');
     canvas.width = sz; canvas.height = sz;
     var ctx = canvas.getContext('2d');
@@ -505,7 +505,8 @@
     for (var i = 0; i < 10; i++) {
       var a = (i * Math.PI / 5) - Math.PI / 2;
       var r = i % 2 === 0 ? ro : ri;
-      ctx[i === 0 ? 'moveTo' : 'lineTo'](cx + r * Math.cos(a), cy + r * Math.sin(a));
+      if (i === 0) { ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); }
+      else         { ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); }
     }
     ctx.closePath();
     ctx.fillStyle = color;
@@ -513,10 +514,10 @@
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.stroke();
-    return canvas;
+    return ctx.getImageData(0, 0, sz, sz);
   }
 
-  function makeSquareCanvas(color, sz) {
+  function makeSquareImageData(color, sz) {
     var canvas = document.createElement('canvas');
     canvas.width = sz; canvas.height = sz;
     var ctx = canvas.getContext('2d');
@@ -525,7 +526,7 @@
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1;
     ctx.strokeRect(1, 1, sz - 2, sz - 2);
-    return canvas;
+    return ctx.getImageData(0, 0, sz, sz);
   }
 
   // ── Layer toggles ─────────────────────────────────────────────────────────
@@ -535,11 +536,11 @@
   }
 
   map.on('load', function () {
-    map.addImage('star-blue',   makeStarCanvas('#1a6bb5', 20));
-    map.addImage('star-orange', makeStarCanvas('#e67e00', 20));
-    map.addImage('sq-blue',     makeSquareCanvas('#1a6bb5', 20));
-    map.addImage('sq-orange',   makeSquareCanvas('#e67e00', 20));
-    map.addImage('sq-purple',   makeSquareCanvas('#9b30ff', 20));
+    map.addImage('star-blue',   makeStarImageData('#1a6bb5', 20));
+    map.addImage('star-orange', makeStarImageData('#e67e00', 20));
+    map.addImage('sq-blue',     makeSquareImageData('#1a6bb5', 20));
+    map.addImage('sq-orange',   makeSquareImageData('#e67e00', 20));
+    map.addImage('sq-purple',   makeSquareImageData('#9b30ff', 20));
 
     document.getElementById('toggleOverlaps').addEventListener('change', function () {
       setOverlapVisibility('overlaps-fill', this.checked);
