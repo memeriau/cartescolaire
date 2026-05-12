@@ -566,7 +566,7 @@
   });
 
   map.on('load', function () {
-    fetch('raw/selection.csv')
+    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv')
       .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
       .then(function (csv) {
         const uais = parseSelectionCSV(csv);
@@ -645,7 +645,7 @@
   map.on('load', function () {
     map.addSource('ecoles', {
       type: 'geojson',
-      data: 'raw/ecoles_elementaires.geojson'
+      data: 'https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/ecoles_elementaires.geojson'
     });
 
     map.addLayer({
@@ -687,7 +687,7 @@
   map.on('load', function () {
     map.addSource('uai-selection', {
       type: 'geojson',
-      data: 'raw/uai_selection.geojson'
+      data: 'https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/uai_selection.geojson'
     });
 
     map.addLayer({
@@ -728,7 +728,7 @@
   map.on('load', function () {
     map.addSource('colleges-publics', {
       type: 'geojson',
-      data: 'raw/colleges_publics.geojson'
+      data: 'https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges_publics.geojson'
     });
 
     map.addLayer({
@@ -769,7 +769,7 @@
   map.on('load', function () {
     map.addSource('colleges-prives', {
       type: 'geojson',
-      data: 'raw/colleges_prives.geojson'
+      data: 'https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/colleges_prives.geojson'
     });
 
     map.addLayer({
