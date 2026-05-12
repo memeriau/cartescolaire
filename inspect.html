@@ -808,12 +808,14 @@
   map.on('click', 'colleges-prives-stars', function (e) {
     if (!e.features || !e.features.length) return;
     const f = e.features[0].properties;
+    const ips = ipsMap[(f.uai || '').toUpperCase()];
     new maplibregl.Popup()
       .setLngLat(e.lngLat)
       .setHTML(
         '<b>' + (f.nom || 'Collège inconnu') + '</b><br>' +
         (f.secteur || '') + '<br>' +
-        'UAI&nbsp;: ' + (f.uai || '')
+        'UAI&nbsp;: ' + (f.uai || '') + '<br>' +
+        'IPS&nbsp;: ' + (ips != null ? ips : 'N/A')
       )
       .addTo(map);
   });
