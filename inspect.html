@@ -228,6 +228,15 @@
       layers: [
         { id: 'osm', type: 'raster', source: 'osm' },
 
+        // Zone outlines below fills so they don't bleed through coloured polygons
+        {
+          id: 'zones-outline',
+          type: 'line',
+          source: 'cs',
+          'source-layer': SOURCE_LAYER,
+          paint: { 'line-color': '#000000', 'line-width': 1.5 }
+        },
+
         // All zones – transparent by default so clicks still register; opacity toggled via paint
         {
           id: 'zones-fill',
@@ -275,13 +284,6 @@
           filter: ['all', ['has', 'uai_1'], ['has', 'multisecteur_overlap'], ['!=', ['get', 'uai_1'], ['get', 'uai_2']]],
           layout: { visibility: 'none' },
           paint: { 'fill-color': '#00008b', 'fill-opacity': 0.35 }
-        },
-        {
-          id: 'zones-outline',
-          type: 'line',
-          source: 'cs',
-          'source-layer': SOURCE_LAYER,
-          paint: { 'line-color': '#000000', 'line-width': 1.5 }
         },
         {
           id: 'zones-highlight',
