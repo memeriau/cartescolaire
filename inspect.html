@@ -228,17 +228,16 @@
       layers: [
         { id: 'osm', type: 'raster', source: 'osm' },
 
-        // All zones – colour driven by pre-computed hue stored in the tile (hidden by default)
+        // All zones – transparent by default so clicks still register; opacity toggled via paint
         {
           id: 'zones-fill',
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           filter: ['!', ['has', 'uai_1']],
-          layout: { visibility: 'none' },
           paint: {
             'fill-color': ['to-color', ['get', 'color']],
-            'fill-opacity': 0.12
+            'fill-opacity': 0
           }
         },
 
@@ -549,7 +548,7 @@
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
     });
     document.getElementById('toggleSelectionOnly').addEventListener('change', function () {
-      map.setLayoutProperty('zones-fill', 'visibility', this.checked ? 'none' : 'visible');
+      map.setPaintProperty('zones-fill', 'fill-opacity', this.checked ? 0 : 0.12);
     });
   });
 
@@ -567,7 +566,7 @@
   });
 
   map.on('load', function () {
-    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv')
+    fetch('raw/selection.csv')
       .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
       .then(function (csv) {
         const uais = parseSelectionCSV(csv);
