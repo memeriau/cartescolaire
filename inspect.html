@@ -166,6 +166,11 @@
         Sélection uniquement
       </label>
       <label>
+        <input type="checkbox" id="toggleUAISelection" checked />
+        <span class="legend-swatch" style="background:#9b30ff;border-radius:50%;"></span>
+        Sélection UAI (écoles primaires)
+      </label>
+      <label>
         <input type="checkbox" id="toggleEcoles" checked />
         <span class="legend-swatch" style="background:#1a1a1a;border-radius:50%;"></span>
         <span class="legend-swatch" style="background:#cc0000;border-radius:50%;"></span>
@@ -616,6 +621,48 @@
       map.setLayoutProperty('ecoles-circles', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
+
+  // ── Sélection UAI (écoles primaires) ─────────────────────────────────────
+
+  map.on('load', function () {
+    map.addSource('uai-selection', {
+      type: 'geojson',
+      data: 'raw/uai_selection.geojson'
+    });
+
+    map.addLayer({
+      id: 'uai-selection-circles',
+      type: 'circle',
+      source: 'uai-selection',
+      paint: {
+        'circle-color': '#9b30ff',
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 10, 7, 14, 11],
+        'circle-opacity': 0.9,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff'
+      }
+    });
+
+    document.getElementById('toggleUAISelection').addEventListener('change', function () {
+      map.setLayoutProperty('uai-selection-circles', 'visibility', this.checked ? 'visible' : 'none');
+    });
+  });
+
+  map.on('click', 'uai-selection-circles', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        '<b>' + (f.nom || 'École inconnue') + '</b><br>' +
+        (f.adresse || '') + ', ' + (f.commune || '') + '<br>' +
+        'UAI&nbsp;: ' + (f.uai || '')
+      )
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'uai-selection-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'uai-selection-circles', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Collèges publics ─────────────────────────────────────────────────────
 
