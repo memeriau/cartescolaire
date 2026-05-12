@@ -161,30 +161,34 @@
         Zone multi-collèges
       </label>
       <label>
-        <input type="checkbox" id="toggleSelectionOnly" />
+        <input type="checkbox" id="toggleSelectionOnly" checked />
         <span class="legend-swatch" style="background:rgba(34,139,34,0.55);border:1px solid #145214;"></span>
         Sélection uniquement
       </label>
       <label>
-        <input type="checkbox" id="toggleUAISelection" checked />
-        <span class="legend-swatch" style="background:#9b30ff;border-radius:50%;"></span>
-        Sélection UAI (écoles primaires)
-      </label>
-      <label>
-        <input type="checkbox" id="toggleEcoles" checked />
-        <span class="legend-swatch" style="background:#1a1a1a;border-radius:50%;"></span>
-        <span class="legend-swatch" style="background:#cc0000;border-radius:50%;"></span>
-        Écoles élémentaires (public / privé)
-      </label>
-      <label>
-        <input type="checkbox" id="toggleCollegesPublics" checked />
-        <span class="legend-swatch" style="background:#1a6bb5;border-radius:50%;"></span>
+        <input type="checkbox" id="toggleCollegesPublics" />
+        <span style="color:#1a6bb5;font-size:15px;line-height:1;flex-shrink:0;">★</span>
         Collèges publics
       </label>
       <label>
-        <input type="checkbox" id="toggleCollegesPrives" checked />
-        <span class="legend-swatch" style="background:#e67e00;border-radius:50%;"></span>
+        <input type="checkbox" id="toggleCollegesPrives" />
+        <span style="color:#e67e00;font-size:15px;line-height:1;flex-shrink:0;">★</span>
         Collèges privés
+      </label>
+      <label>
+        <input type="checkbox" id="toggleEcolesPubliques" />
+        <span style="color:#1a6bb5;font-size:13px;line-height:1;flex-shrink:0;">■</span>
+        Écoles élémentaires publiques
+      </label>
+      <label>
+        <input type="checkbox" id="toggleEcolesPrivees" />
+        <span style="color:#e67e00;font-size:13px;line-height:1;flex-shrink:0;">■</span>
+        Écoles élémentaires privées
+      </label>
+      <label>
+        <input type="checkbox" id="toggleUAISelection" />
+        <span style="color:#9b30ff;font-size:13px;line-height:1;flex-shrink:0;">■</span>
+        Sélection UAI (écoles primaires)
       </label>
     </div>
   </div>
@@ -224,13 +228,14 @@
       layers: [
         { id: 'osm', type: 'raster', source: 'osm' },
 
-        // All zones – colour driven by pre-computed hue stored in the tile
+        // All zones – colour driven by pre-computed hue stored in the tile (hidden by default)
         {
           id: 'zones-fill',
           type: 'fill',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           filter: ['!', ['has', 'uai_1']],
+          layout: { visibility: 'none' },
           paint: {
             'fill-color': ['to-color', ['get', 'color']],
             'fill-opacity': 0.12
@@ -490,6 +495,40 @@
   map.on('mouseenter', 'overlaps-multisecteur-fill', function () { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'overlaps-multisecteur-fill', function () { map.getCanvas().style.cursor = ''; });
 
+  // ── Icon helpers ──────────────────────────────────────────────────────────
+
+  function makeStarCanvas(color, sz) {
+    var canvas = document.createElement('canvas');
+    canvas.width = sz; canvas.height = sz;
+    var ctx = canvas.getContext('2d');
+    var cx = sz / 2, cy = sz / 2, ro = sz / 2 - 1, ri = ro / 2.5;
+    ctx.beginPath();
+    for (var i = 0; i < 10; i++) {
+      var a = (i * Math.PI / 5) - Math.PI / 2;
+      var r = i % 2 === 0 ? ro : ri;
+      ctx[i === 0 ? 'moveTo' : 'lineTo'](cx + r * Math.cos(a), cy + r * Math.sin(a));
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    return canvas;
+  }
+
+  function makeSquareCanvas(color, sz) {
+    var canvas = document.createElement('canvas');
+    canvas.width = sz; canvas.height = sz;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(1, 1, sz - 2, sz - 2);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(1, 1, sz - 2, sz - 2);
+    return canvas;
+  }
+
   // ── Layer toggles ─────────────────────────────────────────────────────────
 
   function setOverlapVisibility(layerId, visible) {
@@ -497,6 +536,12 @@
   }
 
   map.on('load', function () {
+    map.addImage('star-blue',   makeStarCanvas('#1a6bb5', 20));
+    map.addImage('star-orange', makeStarCanvas('#e67e00', 20));
+    map.addImage('sq-blue',     makeSquareCanvas('#1a6bb5', 20));
+    map.addImage('sq-orange',   makeSquareCanvas('#e67e00', 20));
+    map.addImage('sq-purple',   makeSquareCanvas('#9b30ff', 20));
+
     document.getElementById('toggleOverlaps').addEventListener('change', function () {
       setOverlapVisibility('overlaps-fill', this.checked);
     });
@@ -605,20 +650,36 @@
     });
 
     map.addLayer({
-      id: 'ecoles-circles',
-      type: 'circle',
+      id: 'ecoles-publiques-squares',
+      type: 'symbol',
       source: 'ecoles',
-      paint: {
-        'circle-color': ['get', 'color'],
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 2.5, 14, 4],
-        'circle-opacity': 0.85,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#ffffff'
+      filter: ['==', ['get', 'secteur'], 'Public'],
+      layout: {
+        'icon-image': 'sq-blue',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.12, 10, 0.25, 14, 0.5],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
       }
     });
 
-    document.getElementById('toggleEcoles').addEventListener('change', function () {
-      map.setLayoutProperty('ecoles-circles', 'visibility', this.checked ? 'visible' : 'none');
+    map.addLayer({
+      id: 'ecoles-privees-squares',
+      type: 'symbol',
+      source: 'ecoles',
+      filter: ['==', ['get', 'secteur'], 'Privé'],
+      layout: {
+        'icon-image': 'sq-orange',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.12, 10, 0.25, 14, 0.5],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
+      }
+    });
+
+    document.getElementById('toggleEcolesPubliques').addEventListener('change', function () {
+      map.setLayoutProperty('ecoles-publiques-squares', 'visibility', this.checked ? 'visible' : 'none');
+    });
+    document.getElementById('toggleEcolesPrivees').addEventListener('change', function () {
+      map.setLayoutProperty('ecoles-privees-squares', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
 
@@ -631,24 +692,23 @@
     });
 
     map.addLayer({
-      id: 'uai-selection-circles',
-      type: 'circle',
+      id: 'uai-selection-squares',
+      type: 'symbol',
       source: 'uai-selection',
-      paint: {
-        'circle-color': '#9b30ff',
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 4, 10, 7, 14, 11],
-        'circle-opacity': 0.9,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#ffffff'
+      layout: {
+        'icon-image': 'sq-purple',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 10, 0.6, 14, 1.0],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
       }
     });
 
     document.getElementById('toggleUAISelection').addEventListener('change', function () {
-      map.setLayoutProperty('uai-selection-circles', 'visibility', this.checked ? 'visible' : 'none');
+      map.setLayoutProperty('uai-selection-squares', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
 
-  map.on('click', 'uai-selection-circles', function (e) {
+  map.on('click', 'uai-selection-squares', function (e) {
     if (!e.features || !e.features.length) return;
     const f = e.features[0].properties;
     new maplibregl.Popup()
@@ -661,8 +721,8 @@
       .addTo(map);
   });
 
-  map.on('mouseenter', 'uai-selection-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'uai-selection-circles', function () { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'uai-selection-squares', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'uai-selection-squares', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Collèges publics ─────────────────────────────────────────────────────
 
@@ -673,24 +733,23 @@
     });
 
     map.addLayer({
-      id: 'colleges-publics-circles',
-      type: 'circle',
+      id: 'colleges-publics-stars',
+      type: 'symbol',
       source: 'colleges-publics',
-      paint: {
-        'circle-color': '#1a6bb5',
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 2.5, 14, 4],
-        'circle-opacity': 0.85,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#ffffff'
+      layout: {
+        'icon-image': 'star-blue',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.2, 10, 0.35, 14, 0.6],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
       }
     });
 
     document.getElementById('toggleCollegesPublics').addEventListener('change', function () {
-      map.setLayoutProperty('colleges-publics-circles', 'visibility', this.checked ? 'visible' : 'none');
+      map.setLayoutProperty('colleges-publics-stars', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
 
-  map.on('click', 'colleges-publics-circles', function (e) {
+  map.on('click', 'colleges-publics-stars', function (e) {
     if (!e.features || !e.features.length) return;
     const f = e.features[0].properties;
     new maplibregl.Popup()
@@ -703,8 +762,8 @@
       .addTo(map);
   });
 
-  map.on('mouseenter', 'colleges-publics-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'colleges-publics-circles', function () { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'colleges-publics-stars', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'colleges-publics-stars', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Collèges privés ───────────────────────────────────────────────────────
 
@@ -715,24 +774,23 @@
     });
 
     map.addLayer({
-      id: 'colleges-prives-circles',
-      type: 'circle',
+      id: 'colleges-prives-stars',
+      type: 'symbol',
       source: 'colleges-prives',
-      paint: {
-        'circle-color': '#e67e00',
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 2.5, 14, 4],
-        'circle-opacity': 0.85,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#ffffff'
+      layout: {
+        'icon-image': 'star-orange',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.2, 10, 0.35, 14, 0.6],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
       }
     });
 
     document.getElementById('toggleCollegesPrives').addEventListener('change', function () {
-      map.setLayoutProperty('colleges-prives-circles', 'visibility', this.checked ? 'visible' : 'none');
+      map.setLayoutProperty('colleges-prives-stars', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
 
-  map.on('click', 'colleges-prives-circles', function (e) {
+  map.on('click', 'colleges-prives-stars', function (e) {
     if (!e.features || !e.features.length) return;
     const f = e.features[0].properties;
     new maplibregl.Popup()
@@ -745,24 +803,25 @@
       .addTo(map);
   });
 
-  map.on('mouseenter', 'colleges-prives-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'colleges-prives-circles', function () { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'colleges-prives-stars', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'colleges-prives-stars', function () { map.getCanvas().style.cursor = ''; });
 
-  map.on('click', 'ecoles-circles', function (e) {
-    if (!e.features || !e.features.length) return;
-    const f = e.features[0].properties;
-    new maplibregl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(
-        '<b>' + (f.nom || 'École inconnue') + '</b><br>' +
-        (f.secteur || '') + '<br>' +
-        'UAI&nbsp;: ' + (f.uai || '')
-      )
-      .addTo(map);
-  });
-
-  map.on('mouseenter', 'ecoles-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'ecoles-circles', function () { map.getCanvas().style.cursor = ''; });
+  for (var _lid of ['ecoles-publiques-squares', 'ecoles-privees-squares']) {
+    map.on('click', _lid, function (e) {
+      if (!e.features || !e.features.length) return;
+      const f = e.features[0].properties;
+      new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+          '<b>' + (f.nom || 'École inconnue') + '</b><br>' +
+          (f.secteur || '') + '<br>' +
+          'UAI&nbsp;: ' + (f.uai || '')
+        )
+        .addTo(map);
+    });
+    map.on('mouseenter', _lid, function () { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', _lid, function () { map.getCanvas().style.cursor = ''; });
+  }
 
   // ── Input events ───────────────────────────────────────────────────────────
 
