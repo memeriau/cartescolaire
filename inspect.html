@@ -214,6 +214,8 @@
   const protocol = new pmtiles.Protocol();
   maplibregl.addProtocol('pmtiles', protocol.tile.bind(protocol));
 
+  var ipsMap = {};  // UAI → IPS, populated after CSV loads
+
   const PMTILES      = 'pmtiles://https://mathildeemeriau.com/cartescolaire/cartescolaire.pmtiles';
   const SOURCE_LAYER = 'zones';
 
@@ -456,11 +458,14 @@
     if (!e.features || !e.features.length) return;
     if (map.queryRenderedFeatures(e.point, { layers: ['overlaps-fill', 'overlaps-multisecteur-fill'] }).length > 0) return;
     const f = e.features[0].properties;
+    const uai = f.code_rne || '';
+    const ips = ipsMap[uai.toUpperCase()];
     new maplibregl.Popup()
       .setLngLat(e.lngLat)
       .setHTML(
-        'UAI&nbsp;: ' + (f.code_rne || '') + '<br>' +
-        'Nom&nbsp;: ' + (f.nom || 'Nom inconnu')
+        'UAI&nbsp;: ' + uai + '<br>' +
+        'Nom&nbsp;: ' + (f.nom || 'Nom inconnu') + '<br>' +
+        'IPS&nbsp;: ' + (ips != null ? ips : 'N/A')
       )
       .addTo(map);
   });
@@ -851,7 +856,6 @@
       .then(function (r) { return r.text(); })
       .then(function (csvText) {
         csvText = csvText.replace(/^﻿/, '');
-        var ipsMap = {};
         var lines = csvText.trim().split(/\r?\n/);
         for (var i = 1; i < lines.length; i++) {
           var cols = lines[i].split(';');
