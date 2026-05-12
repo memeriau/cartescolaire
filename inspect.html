@@ -250,7 +250,7 @@
           filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
           paint: {
             'fill-color': '#228B22',
-            'fill-opacity': 0.55
+            'fill-opacity': 0.25
           }
         },
 
@@ -261,7 +261,7 @@
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           filter: ['all', ['has', 'uai_1'], ['!', ['has', 'multisecteur_overlap']], ['!=', ['get', 'uai_1'], ['get', 'uai_2']]],
-          paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.75 }
+          paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.35 }
         },
 
         // Overlapping zones – dark blue (intentional multi-secteur overlaps)
@@ -271,14 +271,14 @@
           source: 'cs',
           'source-layer': SOURCE_LAYER,
           filter: ['all', ['has', 'uai_1'], ['has', 'multisecteur_overlap'], ['!=', ['get', 'uai_1'], ['get', 'uai_2']]],
-          paint: { 'fill-color': '#00008b', 'fill-opacity': 0.75 }
+          paint: { 'fill-color': '#00008b', 'fill-opacity': 0.35 }
         },
         {
           id: 'zones-outline',
           type: 'line',
           source: 'cs',
           'source-layer': SOURCE_LAYER,
-          paint: { 'line-color': '#000000', 'line-width': 0.5 }
+          paint: { 'line-color': '#000000', 'line-width': 1.5 }
         },
         {
           id: 'zones-highlight',
