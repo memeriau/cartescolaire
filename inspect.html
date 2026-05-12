@@ -15,9 +15,18 @@
       top: 10px;
       left: 10px;
       width: 380px;
+      max-width: calc(100vw - 20px);
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    @media (max-width: 480px) {
+      #leftPanel { top: 6px; left: 6px; max-width: calc(100vw - 12px); gap: 6px; }
+      #searchBox, #collegeSearchBox { padding: 8px; }
+      #suggestions, #collegeSuggestions { max-height: 160px; }
+      .suggestion { padding: 11px 8px; }
+      .maplibregl-popup-content { max-width: 200px; font-size: 12px; }
     }
 
     #searchBox, #collegeSearchBox {
