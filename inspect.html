@@ -172,6 +172,11 @@
         Écoles élémentaires (public / privé)
       </label>
       <label>
+        <input type="checkbox" id="toggleCollegesPublics" checked />
+        <span class="legend-swatch" style="background:#1a6bb5;border-radius:50%;"></span>
+        Collèges publics
+      </label>
+      <label>
         <input type="checkbox" id="toggleCollegesPrives" checked />
         <span class="legend-swatch" style="background:#e67e00;border-radius:50%;"></span>
         Collèges privés
@@ -611,6 +616,48 @@
       map.setLayoutProperty('ecoles-circles', 'visibility', this.checked ? 'visible' : 'none');
     });
   });
+
+  // ── Collèges publics ─────────────────────────────────────────────────────
+
+  map.on('load', function () {
+    map.addSource('colleges-publics', {
+      type: 'geojson',
+      data: 'raw/colleges_publics.geojson'
+    });
+
+    map.addLayer({
+      id: 'colleges-publics-circles',
+      type: 'circle',
+      source: 'colleges-publics',
+      paint: {
+        'circle-color': '#1a6bb5',
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 2.5, 14, 4],
+        'circle-opacity': 0.85,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#ffffff'
+      }
+    });
+
+    document.getElementById('toggleCollegesPublics').addEventListener('change', function () {
+      map.setLayoutProperty('colleges-publics-circles', 'visibility', this.checked ? 'visible' : 'none');
+    });
+  });
+
+  map.on('click', 'colleges-publics-circles', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        '<b>' + (f.nom || 'Collège inconnu') + '</b><br>' +
+        (f.secteur || '') + '<br>' +
+        'UAI&nbsp;: ' + (f.uai || '')
+      )
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'colleges-publics-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'colleges-publics-circles', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Collèges privés ───────────────────────────────────────────────────────
 
