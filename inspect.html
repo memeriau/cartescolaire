@@ -191,6 +191,11 @@
         Sélection UAI (écoles primaires)
       </label>
       <label>
+        <input type="checkbox" id="toggleEcolesNew" />
+        <span style="color:#e91e63;font-size:15px;line-height:1;flex-shrink:0;">●</span>
+        Sélection écoles primaires (NEW)
+      </label>
+      <label>
         <input type="checkbox" id="toggleIPS" />
         <span class="legend-swatch" style="background:linear-gradient(to right,#ddd,#111);border:1px solid #bbb;"></span>
         IPS collèges (2022)
@@ -544,6 +549,21 @@
     return ctx.getImageData(0, 0, sz, sz);
   }
 
+  function makeCircleImageData(color, sz) {
+    var canvas = document.createElement('canvas');
+    canvas.width = sz; canvas.height = sz;
+    var ctx = canvas.getContext('2d');
+    var cx = sz / 2, cy = sz / 2, r = sz / 2 - 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    return ctx.getImageData(0, 0, sz, sz);
+  }
+
   // ── Layer toggles ─────────────────────────────────────────────────────────
 
   function setOverlapVisibility(layerId, visible) {
@@ -556,6 +576,7 @@
     map.addImage('sq-blue',     makeSquareImageData('#1a6bb5', 20));
     map.addImage('sq-orange',   makeSquareImageData('#e67e00', 20));
     map.addImage('sq-purple',   makeSquareImageData('#9b30ff', 20));
+    map.addImage('circle-pink', makeCircleImageData('#e91e63', 20));
 
     document.getElementById('toggleOverlaps').addEventListener('change', function () {
       setOverlapVisibility('overlaps-fill', this.checked);
@@ -738,6 +759,52 @@
 
   map.on('mouseenter', 'uai-selection-squares', function () { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'uai-selection-squares', function () { map.getCanvas().style.cursor = ''; });
+
+  // ── Sélection écoles primaires NEW ────────────────────────────────────────
+  // Reuses the existing 'ecoles' source; filter set once UAI list is fetched.
+
+  map.on('load', function () {
+    map.addLayer({
+      id: 'ecoles-new-circles',
+      type: 'symbol',
+      source: 'ecoles',
+      filter: ['in', 'uai', ''],   // placeholder, replaced after JSON loads
+      layout: {
+        'icon-image': 'circle-pink',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 10, 0.6, 14, 1.0],
+        'icon-allow-overlap': true,
+        'visibility': 'none'
+      }
+    });
+
+    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/liste_ecoles_new_uais.json')
+      .then(function (r) { return r.json(); })
+      .then(function (uais) {
+        if (uais.length > 0)
+          map.setFilter('ecoles-new-circles', ['in', ['get', 'uai'], ['literal', uais]]);
+      })
+      .catch(function () {});
+
+    document.getElementById('toggleEcolesNew').addEventListener('change', function () {
+      map.setLayoutProperty('ecoles-new-circles', 'visibility', this.checked ? 'visible' : 'none');
+    });
+  });
+
+  map.on('click', 'ecoles-new-circles', function (e) {
+    if (!e.features || !e.features.length) return;
+    const f = e.features[0].properties;
+    new maplibregl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        '<b>' + (f.nom || 'École inconnue') + '</b><br>' +
+        (f.secteur || '') + '<br>' +
+        'UAI&nbsp;: ' + (f.uai || '')
+      )
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'ecoles-new-circles', function () { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'ecoles-new-circles', function () { map.getCanvas().style.cursor = ''; });
 
   // ── Collèges publics ─────────────────────────────────────────────────────
 
