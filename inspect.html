@@ -161,11 +161,6 @@
         Zone multi-collèges
       </label>
       <label>
-        <input type="checkbox" id="toggleSelectionOnly" />
-        <span class="legend-swatch" style="background:rgba(34,139,34,0.55);border:1px solid #145214;"></span>
-        Sélection uniquement
-      </label>
-      <label>
         <input type="checkbox" id="toggleCollegesPublics" />
         <span style="color:#1a6bb5;font-size:15px;line-height:1;flex-shrink:0;">★</span>
         Collèges publics
@@ -259,20 +254,6 @@
           paint: {
             'fill-color': ['to-color', ['get', 'color']],
             'fill-opacity': 0
-          }
-        },
-
-        // Selected colleges (from selection.csv) – green; visibility driven by toggleSelectionOnly
-        {
-          id: 'zones-selected',
-          type: 'fill',
-          source: 'cs',
-          'source-layer': SOURCE_LAYER,
-          filter: ['in', 'code_rne', ''],   // populated after selection.csv loads
-          layout: { visibility: 'none' },
-          paint: {
-            'fill-color': '#228B22',
-            'fill-opacity': 0.75
           }
         },
 
@@ -584,35 +565,11 @@
     document.getElementById('toggleOverlapsMultisecteur').addEventListener('change', function () {
       setOverlapVisibility('overlaps-multisecteur-fill', this.checked);
     });
-    document.getElementById('toggleSelectionOnly').addEventListener('change', function () {
-      map.setLayoutProperty('zones-selected', 'visibility', this.checked ? 'visible' : 'none');
-    });
   });
-
-  // ── Selection CSV ──────────────────────────────────────────────────────────
-
-  function parseSelectionCSV(text) {
-    return text.trim().split(/\r?\n/).slice(1)
-      .map(function (l) { return l.split(',')[0].trim().toUpperCase().replace(/\s+/g, ''); })
-      .filter(function (u) { return u.length > 0; });
-  }
 
   map.once('idle', function () {
     const el = document.getElementById('loading');
     if (el) el.style.display = 'none';
-  });
-
-  map.on('load', function () {
-    fetch('https://raw.githubusercontent.com/memeriau/cartescolaire/main/raw/selection.csv')
-      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
-      .then(function (csv) {
-        const uais = parseSelectionCSV(csv);
-        if (uais.length > 0) {
-          // Legacy filter syntax: ['in', property, v1, v2, ...]
-          map.setFilter('zones-selected', ['in', 'code_rne'].concat(uais));
-        }
-      })
-      .catch(function () {});
   });
 
   // ── College search ────────────────────────────────────────────────────────
