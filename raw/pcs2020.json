@@ -1,0 +1,1246 @@
+[
+  {
+    "code": "10A1",
+    "libelle": "Exploitants agricoles en grandes cultures"
+  },
+  {
+    "code": "10A2",
+    "libelle": "Maraîchers, horticulteurs et pépiniéristes"
+  },
+  {
+    "code": "10A3",
+    "libelle": "Viticulteurs, arboriculteurs"
+  },
+  {
+    "code": "10A4",
+    "libelle": "Éleveurs de bovins"
+  },
+  {
+    "code": "10A5",
+    "libelle": "Éleveurs de moutons, chèvres, chevaux et autres herbivores"
+  },
+  {
+    "code": "10A6",
+    "libelle": "Éleveurs de volailles et de porcs"
+  },
+  {
+    "code": "10A7",
+    "libelle": "Autres exploitants agricoles"
+  },
+  {
+    "code": "10B1",
+    "libelle": "Entrepreneurs de travaux agricoles, ruraux et forestiers"
+  },
+  {
+    "code": "10C1",
+    "libelle": "Entrepreneurs de la pêche et de l’aquaculture"
+  },
+  {
+    "code": "21A1",
+    "libelle": "Entrepreneurs en parcs et jardins, paysagistes"
+  },
+  {
+    "code": "21B1",
+    "libelle": "Artisans maçons"
+  },
+  {
+    "code": "21B2",
+    "libelle": "Artisans charpentiers, couvreurs"
+  },
+  {
+    "code": "21B3",
+    "libelle": "Artisans menuisiers du bâtiment"
+  },
+  {
+    "code": "21B4",
+    "libelle": "Artisans plombiers, chauffagistes"
+  },
+  {
+    "code": "21B5",
+    "libelle": "Artisans électriciens du bâtiment"
+  },
+  {
+    "code": "21B6",
+    "libelle": "Artisans de la peinture et des finitions du bâtiment"
+  },
+  {
+    "code": "21B7",
+    "libelle": "Artisans tout corps de métier du bâtiment et artisans des travaux publics"
+  },
+  {
+    "code": "21C1",
+    "libelle": "Garagistes et autres artisans réparateurs"
+  },
+  {
+    "code": "21C2",
+    "libelle": "Artisans du travail des métaux et du bois"
+  },
+  {
+    "code": "21C3",
+    "libelle": "Artisans de la couture et des autres fabrications"
+  },
+  {
+    "code": "21C4",
+    "libelle": "Artisans d’art"
+  },
+  {
+    "code": "21D1",
+    "libelle": "Artisans bouchers, charcutiers"
+  },
+  {
+    "code": "21D2",
+    "libelle": "Artisans boulangers, pâtissiers"
+  },
+  {
+    "code": "21E1",
+    "libelle": "Conducteurs de taxis, d'ambulances et autres entrepreneurs du transport individuel"
+  },
+  {
+    "code": "21E2",
+    "libelle": "Transporteurs indépendants (routiers, fluviaux, maritimes et aériens)"
+  },
+  {
+    "code": "21E3",
+    "libelle": "Artisans coiffeurs"
+  },
+  {
+    "code": "21E4",
+    "libelle": "Esthéticiens et autres artisans des soins corporels"
+  },
+  {
+    "code": "21E5",
+    "libelle": "Artisans du nettoyage, de la récupération et des services divers"
+  },
+  {
+    "code": "22A1",
+    "libelle": "Commerçants de produits alimentaires"
+  },
+  {
+    "code": "22B1",
+    "libelle": "Commerçants de biens pour le foyer"
+  },
+  {
+    "code": "22B2",
+    "libelle": "Commerçants de biens pour la personne"
+  },
+  {
+    "code": "22B3",
+    "libelle": "Buralistes, marchands de presse et autres commerçants d'articles divers"
+  },
+  {
+    "code": "22C1",
+    "libelle": "Exploitants de cafés, de restaurants"
+  },
+  {
+    "code": "22C2",
+    "libelle": "Exploitants d’hôtels et d’autres hébergements"
+  },
+  {
+    "code": "22D1",
+    "libelle": "Agents généraux et courtiers d’assurance"
+  },
+  {
+    "code": "22D2",
+    "libelle": "Gérants d'agences immobilières"
+  },
+  {
+    "code": "22D3",
+    "libelle": "Agents commerciaux immobiliers"
+  },
+  {
+    "code": "22D4",
+    "libelle": "Intermédiaires du commerce"
+  },
+  {
+    "code": "22D5",
+    "libelle": "Gestionnaires d’autres établissements de service"
+  },
+  {
+    "code": "22D6",
+    "libelle": "Indépendants d’autres prestations de service"
+  },
+  {
+    "code": "23A1",
+    "libelle": "Chefs d’entreprise de 50 personnes et plus"
+  },
+  {
+    "code": "23B1",
+    "libelle": "Chefs d’entreprise du BTP, de 11 à 49 personnes"
+  },
+  {
+    "code": "23B2",
+    "libelle": "Chefs d’entreprise de l’agriculture, de l’industrie et des transports, de 11 à 49 personnes"
+  },
+  {
+    "code": "23B3",
+    "libelle": "Chefs d’entreprise du commerce, de 11 à 49 personnes"
+  },
+  {
+    "code": "23B4",
+    "libelle": "Chefs d’entreprise de services, de 11 à 49 personnes"
+  },
+  {
+    "code": "31A1",
+    "libelle": "Médecins libéraux spécialistes"
+  },
+  {
+    "code": "31A2",
+    "libelle": "Médecins libéraux généralistes"
+  },
+  {
+    "code": "31A3",
+    "libelle": "Chirurgiens-dentistes"
+  },
+  {
+    "code": "31A4",
+    "libelle": "Psychologues, psychanalystes, psychothérapeutes (non médecins)"
+  },
+  {
+    "code": "31A5",
+    "libelle": "Vétérinaires"
+  },
+  {
+    "code": "31A6",
+    "libelle": "Pharmaciens libéraux"
+  },
+  {
+    "code": "31B1",
+    "libelle": "Avocats"
+  },
+  {
+    "code": "31B2",
+    "libelle": "Notaires"
+  },
+  {
+    "code": "31B3",
+    "libelle": "Experts comptables, comptables agréés libéraux"
+  },
+  {
+    "code": "31B4",
+    "libelle": "Experts libéraux des services administratifs et financiers"
+  },
+  {
+    "code": "31B5",
+    "libelle": "Experts libéraux en études techniques"
+  },
+  {
+    "code": "31B6",
+    "libelle": "Architectes libéraux"
+  },
+  {
+    "code": "31B7",
+    "libelle": "Autres professions libérales judiciaires et techniques"
+  },
+  {
+    "code": "33A1",
+    "libelle": "Cadres de direction de la fonction publique"
+  },
+  {
+    "code": "33A2",
+    "libelle": "Magistrats"
+  },
+  {
+    "code": "33B1",
+    "libelle": "Ingénieurs et cadres techniques de la fonction publique"
+  },
+  {
+    "code": "33C1",
+    "libelle": "Cadres administratifs de l’État"
+  },
+  {
+    "code": "33C2",
+    "libelle": "Cadres administratifs des collectivités territoriales et des hôpitaux publics"
+  },
+  {
+    "code": "33D1",
+    "libelle": "Officiers des Armées et de la Gendarmerie (sauf grades de colonels, généraux et équivalents)"
+  },
+  {
+    "code": "33E1",
+    "libelle": "Responsables politiques et syndicaux"
+  },
+  {
+    "code": "34A1",
+    "libelle": "Enseignants titulaires du secondaire général et technologique"
+  },
+  {
+    "code": "34A2",
+    "libelle": "Chefs d'établissement de l'enseignement secondaire, inspecteurs"
+  },
+  {
+    "code": "34A3",
+    "libelle": "Psychologues et conseillers de l'orientation scolaire et professionnelle"
+  },
+  {
+    "code": "34B1",
+    "libelle": "Enseignants du supérieur"
+  },
+  {
+    "code": "34B2",
+    "libelle": "Chercheurs de la recherche publique"
+  },
+  {
+    "code": "34C1",
+    "libelle": "Médecins salariés hospitaliers"
+  },
+  {
+    "code": "34C2",
+    "libelle": "Médecins salariés non hospitaliers"
+  },
+  {
+    "code": "34C3",
+    "libelle": "Internes en médecine, odontologie et pharmacie"
+  },
+  {
+    "code": "34C4",
+    "libelle": "Pharmaciens salariés"
+  },
+  {
+    "code": "35A1",
+    "libelle": "Documentalistes, bibliothécaires de la fonction publique et autres cadres du patrimoine"
+  },
+  {
+    "code": "35B1",
+    "libelle": "Journalistes et professions assimilées"
+  },
+  {
+    "code": "35B2",
+    "libelle": "Auteurs littéraires, scénaristes, dialoguistes"
+  },
+  {
+    "code": "35C1",
+    "libelle": "Cadres de la presse, de l'édition, responsables de la production et de la programmation audiovisuelle et des spectacles"
+  },
+  {
+    "code": "35C2",
+    "libelle": "Cadres artistiques et technico-artistiques des arts graphiques, du design, de la réalisation audiovisuelle et des spectacles"
+  },
+  {
+    "code": "35D1",
+    "libelle": "Artistes plasticiens"
+  },
+  {
+    "code": "35D2",
+    "libelle": "Artistes de la musique et du chant"
+  },
+  {
+    "code": "35D3",
+    "libelle": "Artistes du théâtre, de la danse et des spectacles divers"
+  },
+  {
+    "code": "35D4",
+    "libelle": "Professeurs d'art (hors établissement scolaire) et directeurs d'établissements d'enseignement artistique"
+  },
+  {
+    "code": "37A1",
+    "libelle": "Cadres dirigeants des entreprises (fonctions administratives, financières et commerciales)"
+  },
+  {
+    "code": "37B1",
+    "libelle": "Chargés d’études socio-économiques et experts du traitement des données"
+  },
+  {
+    "code": "37B2",
+    "libelle": "Cadres de l’organisation, du contrôle des services administratifs et financiers"
+  },
+  {
+    "code": "37B3",
+    "libelle": "Cadres spécialistes des ressources humaines et du recrutement"
+  },
+  {
+    "code": "37B4",
+    "libelle": "Cadres spécialistes de la formation et de la documentation"
+  },
+  {
+    "code": "37B5",
+    "libelle": "Juristes"
+  },
+  {
+    "code": "37C1",
+    "libelle": "Cadres généralistes des services financiers et comptables"
+  },
+  {
+    "code": "37C2",
+    "libelle": "Cadres généralistes des services administratifs"
+  },
+  {
+    "code": "37D1",
+    "libelle": "Directeurs de magasins et cadres de l’exploitation du commerce de détail"
+  },
+  {
+    "code": "37D2",
+    "libelle": "Acheteurs du commerce"
+  },
+  {
+    "code": "37D3",
+    "libelle": "Cadres commerciaux (hors banque et assurance)"
+  },
+  {
+    "code": "37D4",
+    "libelle": "Chefs de produits et autres cadres du marketing"
+  },
+  {
+    "code": "37D5",
+    "libelle": "Cadres de la communication, de la publicité et des relations publiques"
+  },
+  {
+    "code": "37E1",
+    "libelle": "Directeurs d'agences de la banque et des assurances"
+  },
+  {
+    "code": "37E2",
+    "libelle": "Cadres commerciaux de la banque et des assurances"
+  },
+  {
+    "code": "37E3",
+    "libelle": "Cadres techniques de la banque, des assurances et des organismes de sécurité sociale"
+  },
+  {
+    "code": "37E4",
+    "libelle": "Cadres de l'immobilier"
+  },
+  {
+    "code": "37F1",
+    "libelle": "Cadres de l'hôtellerie et de la restauration"
+  },
+  {
+    "code": "38A1",
+    "libelle": "Cadres dirigeants techniques des entreprises"
+  },
+  {
+    "code": "38B1",
+    "libelle": "Ingénieurs et cadres techniques de l’agriculture, de l’aquaculture, des forêts et de la protection de l’environnement"
+  },
+  {
+    "code": "38C1",
+    "libelle": "Ingénieurs et cadres d'études du BTP"
+  },
+  {
+    "code": "38C2",
+    "libelle": "Architectes salariés"
+  },
+  {
+    "code": "38C3",
+    "libelle": "Ingénieurs et cadres de chantier du BTP"
+  },
+  {
+    "code": "38D1",
+    "libelle": "Ingénieurs et cadres d’études, recherche et développement de l’industrie"
+  },
+  {
+    "code": "38D2",
+    "libelle": "Ingénieurs et cadres de production"
+  },
+  {
+    "code": "38E1",
+    "libelle": "Ingénieurs et cadres techniques de l’exploitation des transports"
+  },
+  {
+    "code": "38E2",
+    "libelle": "Officiers et cadres navigants de l’aviation civile et de la marine marchande"
+  },
+  {
+    "code": "38F1",
+    "libelle": "Acheteurs et cadres des achats du BTP et de l’industrie"
+  },
+  {
+    "code": "38F2",
+    "libelle": "Ingénieurs et cadres de la logistique, de l’ordonnancement-planification et des méthodes de production"
+  },
+  {
+    "code": "38F3",
+    "libelle": "Ingénieurs et cadres du contrôle-qualité et de la prévention des risques"
+  },
+  {
+    "code": "38F4",
+    "libelle": "Ingénieurs et cadres d'installation et de maintenance (hors informatique)"
+  },
+  {
+    "code": "38F5",
+    "libelle": "Ingénieurs commerciaux et cadres technico-commerciaux"
+  },
+  {
+    "code": "38G1",
+    "libelle": "Chefs de projet, responsables informatiques et du conseil informatique"
+  },
+  {
+    "code": "38G2",
+    "libelle": "Ingénieurs et cadres d’études, de recherche et développement informatique et de production des données"
+  },
+  {
+    "code": "38G3",
+    "libelle": "Ingénieurs et cadres d'exploitation informatique (réseaux, systèmes, sécurité et support)"
+  },
+  {
+    "code": "42A1",
+    "libelle": "Enseignants titulaires du primaire"
+  },
+  {
+    "code": "42A2",
+    "libelle": "Enseignants titulaires du secondaire professionnel"
+  },
+  {
+    "code": "42A3",
+    "libelle": "Enseignants non titulaires du primaire et du secondaire"
+  },
+  {
+    "code": "42A4",
+    "libelle": "Professeurs de soutien scolaire"
+  },
+  {
+    "code": "42B1",
+    "libelle": "Conseillers principaux d'éducation"
+  },
+  {
+    "code": "42B2",
+    "libelle": "Surveillants scolaires et assistants d’éducation"
+  },
+  {
+    "code": "42C1",
+    "libelle": "Moniteurs d'écoles de conduite"
+  },
+  {
+    "code": "42C2",
+    "libelle": "Formateurs, bibliothécaires et documentalistes (non cadres)"
+  },
+  {
+    "code": "42C3",
+    "libelle": "Éducateurs sportifs, sportifs professionnels"
+  },
+  {
+    "code": "43A1",
+    "libelle": "Cadres de santé"
+  },
+  {
+    "code": "43A2",
+    "libelle": "Sages-femmes"
+  },
+  {
+    "code": "43A3",
+    "libelle": "Infirmiers libéraux"
+  },
+  {
+    "code": "43A4",
+    "libelle": "Infirmiers spécialisés salariés"
+  },
+  {
+    "code": "43A5",
+    "libelle": "Infirmiers en soins généraux salariés"
+  },
+  {
+    "code": "43B1",
+    "libelle": "Masseurs-kinésithérapeutes rééducateurs"
+  },
+  {
+    "code": "43B2",
+    "libelle": "Spécialistes de la rééducation de la motricité, du langage et de la vue"
+  },
+  {
+    "code": "43C1",
+    "libelle": "Techniciens médicaux"
+  },
+  {
+    "code": "43C2",
+    "libelle": "Opticiens, prothésistes et autres spécialistes de l'appareillage médical"
+  },
+  {
+    "code": "43C3",
+    "libelle": "Préparateurs en pharmacie"
+  },
+  {
+    "code": "43D1",
+    "libelle": "Directeurs et cadres du travail social et de l'animation socio-culturelle"
+  },
+  {
+    "code": "43D2",
+    "libelle": "Assistants de service social, conseillers en économie sociale et familiale"
+  },
+  {
+    "code": "43D3",
+    "libelle": "Éducateurs spécialisés"
+  },
+  {
+    "code": "43D4",
+    "libelle": "Moniteurs éducateurs"
+  },
+  {
+    "code": "43D5",
+    "libelle": "Éducateurs techniques spécialisés, moniteurs d’ateliers"
+  },
+  {
+    "code": "43D6",
+    "libelle": "Éducateurs de jeunes enfants"
+  },
+  {
+    "code": "43D7",
+    "libelle": "Animateurs socio-culturels et de loisirs"
+  },
+  {
+    "code": "44A1",
+    "libelle": "Ministres du culte et religieux consacrés"
+  },
+  {
+    "code": "45A1",
+    "libelle": "Personnels intermédiaires administratifs de l'État"
+  },
+  {
+    "code": "45A2",
+    "libelle": "Personnels intermédiaires administratifs des collectivités territoriales et des hôpitaux publics"
+  },
+  {
+    "code": "45B1",
+    "libelle": "Personnels de commandement de la Police nationale et de l’administration pénitentiaire"
+  },
+  {
+    "code": "45B2",
+    "libelle": "Sous-officiers supérieurs des Armées et de la Gendarmerie"
+  },
+  {
+    "code": "46A1",
+    "libelle": "Assistants, secrétaires de direction (non cadres)"
+  },
+  {
+    "code": "46A2",
+    "libelle": "Maîtrise et techniciens des services comptables et du traitement des données"
+  },
+  {
+    "code": "46A3",
+    "libelle": "Maîtrise et techniciens des services juridiques et du personnel"
+  },
+  {
+    "code": "46A4",
+    "libelle": "Maîtrise et techniciens des autres services administratifs"
+  },
+  {
+    "code": "46B1",
+    "libelle": "Responsables (non cadres) de magasins"
+  },
+  {
+    "code": "46B2",
+    "libelle": "Responsables (non cadres) d'un secteur ou d'un rayon dans un commerce de détail"
+  },
+  {
+    "code": "46B3",
+    "libelle": "Acheteurs (non cadres) et responsables des achats"
+  },
+  {
+    "code": "46B4",
+    "libelle": "Responsables (non cadres) du marketing et de l’animation commerciale des magasins"
+  },
+  {
+    "code": "46B5",
+    "libelle": "Autres professions intermédiaires des services commerciaux"
+  },
+  {
+    "code": "46C1",
+    "libelle": "Représentants, technico-commerciaux de la vente de biens auprès de professionnels"
+  },
+  {
+    "code": "46C2",
+    "libelle": "Représentants, technico-commerciaux de la vente de services auprès des professionnels"
+  },
+  {
+    "code": "46C3",
+    "libelle": "Représentants, technico-commerciaux auprès des particuliers"
+  },
+  {
+    "code": "46D1",
+    "libelle": "Chargés de clientèle de la banque et des assurances"
+  },
+  {
+    "code": "46D2",
+    "libelle": "Techniciens de la banque, des assurances et des organismes de sécurité sociale"
+  },
+  {
+    "code": "46E1",
+    "libelle": "Assistants de la communication, de la publicité et des relations publiques"
+  },
+  {
+    "code": "46E2",
+    "libelle": "Graphistes et autres professions intermédiaires des arts graphiques, de la mode et de la décoration"
+  },
+  {
+    "code": "46E3",
+    "libelle": "Photographes et assistants techniques de la réalisation des spectacles vivants et audiovisuels"
+  },
+  {
+    "code": "46F1",
+    "libelle": "Responsables (non cadres) des services administratifs et commerciaux des transports et du tourisme"
+  },
+  {
+    "code": "46F2",
+    "libelle": "Responsables (non cadres) d'exploitation des transports"
+  },
+  {
+    "code": "46G1",
+    "libelle": "Responsables (non cadres) de la gestion et des services de l'hôtellerie-restauration"
+  },
+  {
+    "code": "47A1",
+    "libelle": "Techniciens de l’agriculture, de l’aquaculture, des forêts et de la protection de l’environnement"
+  },
+  {
+    "code": "47B1",
+    "libelle": "Techniciens d’études du BTP"
+  },
+  {
+    "code": "47B2",
+    "libelle": "Techniciens de chantier du BTP"
+  },
+  {
+    "code": "47C1",
+    "libelle": "Dessinateurs industriels"
+  },
+  {
+    "code": "47C2",
+    "libelle": "Techniciens de recherche et développement de l’industrie"
+  },
+  {
+    "code": "47C3",
+    "libelle": "Techniciens de fabrication industrielle"
+  },
+  {
+    "code": "47D1",
+    "libelle": "Techniciens de la logistique, de l'ordonnancement-planification et des méthodes de production"
+  },
+  {
+    "code": "47D2",
+    "libelle": "Techniciens du contrôle-qualité et de la prévention des risques"
+  },
+  {
+    "code": "47D3",
+    "libelle": "Techniciens d’installation et de maintenance (hors informatique)"
+  },
+  {
+    "code": "47E1",
+    "libelle": "Techniciens d’études, de recherche et développement informatique et de production des données"
+  },
+  {
+    "code": "47E2",
+    "libelle": "Techniciens d'exploitation informatique (réseaux, systèmes, sécurité et support)"
+  },
+  {
+    "code": "47F1",
+    "libelle": "Techniciens des laboratoires de recherche publique et de l’enseignement"
+  },
+  {
+    "code": "48A1",
+    "libelle": "Agents de maîtrise de l’agriculture, des travaux forestiers et de la pêche"
+  },
+  {
+    "code": "48B1",
+    "libelle": "Conducteurs de travaux (non cadres), chefs de chantier"
+  },
+  {
+    "code": "48C1",
+    "libelle": "Agents de maîtrise en fabrication industrielle"
+  },
+  {
+    "code": "48C2",
+    "libelle": "Agents de maîtrise et techniciens en production et distribution d'énergie et d'eau"
+  },
+  {
+    "code": "48D1",
+    "libelle": "Agents de maîtrise en installation et maintenance (hors informatique)"
+  },
+  {
+    "code": "48E1",
+    "libelle": "Responsables (non cadres) d’entrepôt, de magasinage et de manutention"
+  },
+  {
+    "code": "48F1",
+    "libelle": "Chefs de cuisine et responsables de production en restauration"
+  },
+  {
+    "code": "52A1",
+    "libelle": "Agents d'accueil et de guichet des administrations publiques"
+  },
+  {
+    "code": "52A2",
+    "libelle": "Employés de la fonction publique (secrétariat, gestion, comptabilité)"
+  },
+  {
+    "code": "52A3",
+    "libelle": "Employés administratifs de la fonction publique à technicité spécifique"
+  },
+  {
+    "code": "52A4",
+    "libelle": "Facteurs et employés du service universel du courrier"
+  },
+  {
+    "code": "52B1",
+    "libelle": "Agents de service de nettoyage (État, collectivités territoriales)"
+  },
+  {
+    "code": "52B2",
+    "libelle": "Agents de service de surveillance et de restauration (État, collectivités territoriales)"
+  },
+  {
+    "code": "52B3",
+    "libelle": "Agents de service des établissements de santé"
+  },
+  {
+    "code": "52C1",
+    "libelle": "Aides-soignants"
+  },
+  {
+    "code": "52C2",
+    "libelle": "Assistants de professions médicales et paramédicales"
+  },
+  {
+    "code": "52C3",
+    "libelle": "Auxiliaires de puériculture"
+  },
+  {
+    "code": "52C4",
+    "libelle": "Agents spécialisés de crèche et des écoles maternelles"
+  },
+  {
+    "code": "52C5",
+    "libelle": "Aides médico-psychologiques et professions assimilées"
+  },
+  {
+    "code": "52C6",
+    "libelle": "Ambulanciers"
+  },
+  {
+    "code": "53A1",
+    "libelle": "Personnels d’encadrement et d’application de la Police nationale"
+  },
+  {
+    "code": "53A2",
+    "libelle": "Agents des polices municipales"
+  },
+  {
+    "code": "53A3",
+    "libelle": "Personnels d’encadrement et d’application de l’administration pénitentiaire"
+  },
+  {
+    "code": "53B1",
+    "libelle": "Gendarmes"
+  },
+  {
+    "code": "53B2",
+    "libelle": "Sous-officiers subalternes des Armées"
+  },
+  {
+    "code": "53B3",
+    "libelle": "Militaires du rang"
+  },
+  {
+    "code": "53C1",
+    "libelle": "Pompiers"
+  },
+  {
+    "code": "53D1",
+    "libelle": "Agents de sécurité et surveillance privées"
+  },
+  {
+    "code": "54A1",
+    "libelle": "Hôtes d'accueil et standardistes"
+  },
+  {
+    "code": "54A2",
+    "libelle": "Secrétaires, employés de la bureautique"
+  },
+  {
+    "code": "54A3",
+    "libelle": "Employés des services comptables et financiers"
+  },
+  {
+    "code": "54B1",
+    "libelle": "Employés commerciaux de la banque et des assurances"
+  },
+  {
+    "code": "54B2",
+    "libelle": "Employés techniques de la banque, des assurances et des organismes de sécurité sociale"
+  },
+  {
+    "code": "54C1",
+    "libelle": "Contrôleurs et agents d'accompagnement des transports et du tourisme"
+  },
+  {
+    "code": "54C2",
+    "libelle": "Employés des services commerciaux des transports de voyageurs et du tourisme"
+  },
+  {
+    "code": "54C3",
+    "libelle": "Employés administratifs d'exploitation des transports de marchandises et de la logistique"
+  },
+  {
+    "code": "54D1",
+    "libelle": "Employés administratifs des services commerciaux"
+  },
+  {
+    "code": "54D2",
+    "libelle": "Employés des autres services administratifs"
+  },
+  {
+    "code": "55A1",
+    "libelle": "Vendeurs en produits alimentaires"
+  },
+  {
+    "code": "55B1",
+    "libelle": "Vendeurs de biens pour le foyer"
+  },
+  {
+    "code": "55B2",
+    "libelle": "Vendeurs en produits de beauté, culturels et de loisirs"
+  },
+  {
+    "code": "55B3",
+    "libelle": "Vendeurs en habillement et articles de sport"
+  },
+  {
+    "code": "55B4",
+    "libelle": "Autres vendeurs spécialisés (carburant, tabac, presse)"
+  },
+  {
+    "code": "55C1",
+    "libelle": "Vendeurs non spécialisés"
+  },
+  {
+    "code": "55D1",
+    "libelle": "Caissiers du commerce"
+  },
+  {
+    "code": "55D2",
+    "libelle": "Employés de libre-service du commerce"
+  },
+  {
+    "code": "55E1",
+    "libelle": "Télévendeurs, téléconseillers"
+  },
+  {
+    "code": "56A1",
+    "libelle": "Serveurs"
+  },
+  {
+    "code": "56A2",
+    "libelle": "Employés polyvalents de la restauration, aides de cuisine"
+  },
+  {
+    "code": "56A3",
+    "libelle": "Employés d'accueil et de réception de l'hôtellerie"
+  },
+  {
+    "code": "56A4",
+    "libelle": "Employés d'étage, employés polyvalents de l'hôtellerie"
+  },
+  {
+    "code": "56B1",
+    "libelle": "Coiffeurs"
+  },
+  {
+    "code": "56B2",
+    "libelle": "Esthéticiens et autres employés des soins corporels"
+  },
+  {
+    "code": "56C1",
+    "libelle": "Assistants familiaux, familles d'accueil"
+  },
+  {
+    "code": "56C2",
+    "libelle": "Assistants maternels agréés"
+  },
+  {
+    "code": "56C3",
+    "libelle": "Autres salariés de particuliers pour la garde d’enfants"
+  },
+  {
+    "code": "56D1",
+    "libelle": "Auxiliaires de vie sociale"
+  },
+  {
+    "code": "56D2",
+    "libelle": "Autres employés d’aide à domicile et accueillants familiaux"
+  },
+  {
+    "code": "56E1",
+    "libelle": "Employés de maison et personnels de ménage chez des particuliers"
+  },
+  {
+    "code": "56E2",
+    "libelle": "Concierges et gardiens d'immeuble d'habitation"
+  },
+  {
+    "code": "56F1",
+    "libelle": "Autres employés des services aux particuliers"
+  },
+  {
+    "code": "62A1",
+    "libelle": "Conducteurs d’engins de chantier des travaux publics"
+  },
+  {
+    "code": "62A2",
+    "libelle": "Autres ouvriers qualifiés des travaux publics et des industries extractives"
+  },
+  {
+    "code": "62B1",
+    "libelle": "Câbleurs en électricité et électronique"
+  },
+  {
+    "code": "62B2",
+    "libelle": "Mécaniciens monteurs, ajusteurs qualifiés"
+  },
+  {
+    "code": "62B3",
+    "libelle": "Ouvriers qualifiés d’usinage des métaux"
+  },
+  {
+    "code": "62B4",
+    "libelle": "Ouvriers qualifiés du traçage, découpage, formage et soudage des métaux"
+  },
+  {
+    "code": "62C1",
+    "libelle": "Ouvriers qualifiés de l’agroalimentaire"
+  },
+  {
+    "code": "62C2",
+    "libelle": "Ouvriers qualifiés de la métallurgie, de la production verrière et des matériaux de construction"
+  },
+  {
+    "code": "62C3",
+    "libelle": "Ouvriers qualifiés de la chimie, de la plasturgie et des matériaux composites"
+  },
+  {
+    "code": "62C4",
+    "libelle": "Ouvriers qualifiés de l’eau, de l’énergie et du traitement des déchets"
+  },
+  {
+    "code": "62D1",
+    "libelle": "Ouvriers qualifiés du textile, de l’habillement et du cuir"
+  },
+  {
+    "code": "62D2",
+    "libelle": "Ouvriers qualifiés du bois et de la fabrication de papier-carton"
+  },
+  {
+    "code": "62D3",
+    "libelle": "Ouvriers qualifiés de la composition, de l’impression et du façonnage du papier-carton"
+  },
+  {
+    "code": "62E1",
+    "libelle": "Conducteurs qualifiés de lignes de production"
+  },
+  {
+    "code": "62E2",
+    "libelle": "Régleurs qualifiés d’équipements de fabrication"
+  },
+  {
+    "code": "62E3",
+    "libelle": "Ouvriers qualifiés des traitements thermiques et de surface"
+  },
+  {
+    "code": "62E4",
+    "libelle": "Ouvriers qualifiés de contrôle et d’essais et de laboratoire (hors santé, hors imprimerie)"
+  },
+  {
+    "code": "62E5",
+    "libelle": "Ouvriers qualifiés de maintenance et d’entretien des équipements industriels"
+  },
+  {
+    "code": "63A1",
+    "libelle": "Ouvriers des parcs et jardins"
+  },
+  {
+    "code": "63B1",
+    "libelle": "Maçons et ouvriers qualifiés du travail de la pierre"
+  },
+  {
+    "code": "63B2",
+    "libelle": "Charpentiers et couvreurs qualifiés"
+  },
+  {
+    "code": "63B3",
+    "libelle": "Menuisiers qualifiés du bâtiment"
+  },
+  {
+    "code": "63B4",
+    "libelle": "Plombiers, chauffagistes qualifiés"
+  },
+  {
+    "code": "63B5",
+    "libelle": "Électriciens qualifiés du bâtiment"
+  },
+  {
+    "code": "63B6",
+    "libelle": "Peintres et ouvriers qualifiés de la finition du bâtiment"
+  },
+  {
+    "code": "63B7",
+    "libelle": "Ouvriers qualifiés d'entretien général des bâtiments"
+  },
+  {
+    "code": "63C1",
+    "libelle": "Carrossiers qualifiés d’automobiles"
+  },
+  {
+    "code": "63C2",
+    "libelle": "Réparateurs qualifiés de véhicules et de biens d’équipement du foyer"
+  },
+  {
+    "code": "63C3",
+    "libelle": "Métalliers, ébénistes et autres ouvriers qualifiés du travail des métaux et du bois"
+  },
+  {
+    "code": "63C4",
+    "libelle": "Couturiers et ouvriers qualifiés des autres fabrications"
+  },
+  {
+    "code": "63D1",
+    "libelle": "Bouchers, charcutiers"
+  },
+  {
+    "code": "63D2",
+    "libelle": "Boulangers, pâtissiers"
+  },
+  {
+    "code": "63E1",
+    "libelle": "Cuisiniers et ouvriers qualifiés de la restauration"
+  },
+  {
+    "code": "63F1",
+    "libelle": "Ouvriers d’arts, ouvriers et techniciens des spectacles"
+  },
+  {
+    "code": "64A1",
+    "libelle": "Conducteurs routiers de transport en commun"
+  },
+  {
+    "code": "64A2",
+    "libelle": "Conducteurs salariés de taxi et d'autres véhicules de transport individuel"
+  },
+  {
+    "code": "64B1",
+    "libelle": "Conducteurs de poids lourds"
+  },
+  {
+    "code": "64B2",
+    "libelle": "Chauffeurs-livreurs, conducteurs de la collecte de déchets"
+  },
+  {
+    "code": "64B3",
+    "libelle": "Coursiers, livreurs, distributeurs à domicile"
+  },
+  {
+    "code": "65A1",
+    "libelle": "Dockers et conducteurs d’engins lourds de manœuvre et de levage"
+  },
+  {
+    "code": "65B1",
+    "libelle": "Caristes"
+  },
+  {
+    "code": "65C1",
+    "libelle": "Magasiniers et ouvriers assimilés de la logistique"
+  },
+  {
+    "code": "65D1",
+    "libelle": "Conducteurs de trains, matelots de la marine marchande"
+  },
+  {
+    "code": "65D2",
+    "libelle": "Ouvriers qualifiés sédentaires d'exploitation des transports"
+  },
+  {
+    "code": "67A1",
+    "libelle": "Ouvriers peu qualifiés des travaux publics et des industries extractives"
+  },
+  {
+    "code": "67B1",
+    "libelle": "Ouvriers peu qualifiés de l'électricité et de l'électronique"
+  },
+  {
+    "code": "67B2",
+    "libelle": "Ouvriers peu qualifiés de montage et contrôle en mécanique"
+  },
+  {
+    "code": "67B3",
+    "libelle": "Ouvriers peu qualifiés du travail des métaux"
+  },
+  {
+    "code": "67C1",
+    "libelle": "Ouvriers peu qualifiés de l’agroalimentaire"
+  },
+  {
+    "code": "67C2",
+    "libelle": "Ouvriers peu qualifiés de la métallurgie, de la production verrière et des matériaux de construction"
+  },
+  {
+    "code": "67C3",
+    "libelle": "Ouvriers peu qualifiés de la chimie, de la plasturgie et des matériaux composites"
+  },
+  {
+    "code": "67D1",
+    "libelle": "Ouvriers peu qualifiés du textile, de l’habillement et du cuir"
+  },
+  {
+    "code": "67D2",
+    "libelle": "Ouvriers peu qualifiés du bois, de la fabrication de papier-carton et de l’impression"
+  },
+  {
+    "code": "67E1",
+    "libelle": "Ouvriers peu qualifiés de la réception et de l'expédition"
+  },
+  {
+    "code": "67E2",
+    "libelle": "Manutentionnaires peu qualifiés et professions assimilées"
+  },
+  {
+    "code": "67E3",
+    "libelle": "Agents peu qualifiés des services d'exploitation des transports"
+  },
+  {
+    "code": "68A1",
+    "libelle": "Ouvriers peu qualifiés du gros œuvre du bâtiment"
+  },
+  {
+    "code": "68A2",
+    "libelle": "Ouvriers peu qualifiés du second œuvre du bâtiment"
+  },
+  {
+    "code": "68B1",
+    "libelle": "Ouvriers peu qualifiés de l’entretien et de la réparation de véhicules"
+  },
+  {
+    "code": "68B2",
+    "libelle": "Ouvriers peu qualifiés du travail artisanal des matériaux"
+  },
+  {
+    "code": "68C1",
+    "libelle": "Apprentis de l’artisanat alimentaire"
+  },
+  {
+    "code": "68D1",
+    "libelle": "Ouvriers du nettoyage"
+  },
+  {
+    "code": "68D2",
+    "libelle": "Ouvriers peu qualifiés de l’assainissement et du traitement des déchets"
+  },
+  {
+    "code": "69A1",
+    "libelle": "Ouvriers agricoles de grandes cultures et de polyculture-élevage"
+  },
+  {
+    "code": "69A2",
+    "libelle": "Ouvriers du maraîchage, de l’horticulture et des pépinières"
+  },
+  {
+    "code": "69A3",
+    "libelle": "Ouvriers de la viticulture et de l’arboriculture fruitière"
+  },
+  {
+    "code": "69A4",
+    "libelle": "Ouvriers de l’élevage"
+  },
+  {
+    "code": "69B1",
+    "libelle": "Ouvriers forestiers"
+  },
+  {
+    "code": "69C1",
+    "libelle": "Ouvriers de la pêche et de l’aquaculture"
+  }
+]
